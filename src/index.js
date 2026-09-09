@@ -1,54 +1,85 @@
 const LOCATOR_API =
   "https://api.cloudflare.riftbound.uvsgames.com/hydraproxy/api/v2";
 
+const PAGE_SIZE = 250;
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // TEST: διάβασε πραγματικά events από τον υπάρχοντα Riftbound locator
+    // TEST: διάβασε ΟΛΑ τα events από τον υπάρχοντα locator
     if (url.pathname === "/api/locator-test") {
       try {
         const startDate = new Date();
         const endDate = new Date();
         endDate.setDate(endDate.getDate() + 90);
 
-        const params = new URLSearchParams({
-          start_date_after: startDate.toISOString(),
-          start_date_before: endDate.toISOString(),
-          display_status: "upcoming",
-          latitude: "37.9838",
-          longitude: "23.7275",
-          num_miles: "600",
-          upcoming_only: "true",
-          game_slug: "riftbound",
-          page: "1",
-          page_size: "250"
-        });
+        let page = 1;
+        let total = null;
+        let allEvents = [];
 
-        const response = await fetch(
-          `${LOCATOR_API}/events/?${params.toString()}`,
-          {
-            headers: {
-              Accept: "application/json"
-            }
-          }
-        );
+        while (true) {
+          const params = new URLSearchParams({
+            start_date_after: startDate.toISOString(),
+            start_date_before: endDate.toISOString(),
+            display_status: "upcoming",
+            latitude: "37.9838",
+            longitude: "23.7275",
+            num_miles: "600",
+            upcoming_only: "true",
+            game_slug: "riftbound",
+            page: String(page),
+            page_size: String(PAGE_SIZE)
+          });
 
-        if (!response.ok) {
-          return Response.json(
+          const response = await fetch(
+            `${LOCATOR_API}/events/?${params.toString()}`,
             {
-              success: false,
-              status: response.status,
-              error: `Locator returned HTTP ${response.status}`
-            },
-            { status: 500 }
+              headers: {
+                Accept: "application/json"
+              }
+            }
           );
-        }
 
-        const data = await response.json();
-        const allEvents = Array.isArray(data.results)
-          ? data.results
-          : [];
+          if (!response.ok) {
+            return Response.json(
+              {
+                success: false,
+                page,
+                status: response.status,
+                error: `Locator returned HTTP ${response.status}`
+              },
+              { status: 500 }
+            );
+          }
+
+          const data = await response.json();
+
+          const pageEvents = Array.isArray(data.results)
+            ? data.results
+            : [];
+
+          if (total === null) {
+            total = Number(data.total || 0);
+          }
+
+          allEvents.push(...pageEvents);
+
+          if (
+            pageEvents.length === 0 ||
+            pageEvents.length < PAGE_SIZE ||
+            allEvents.length >= total
+          ) {
+            break;
+          }
+
+          page++;
+
+          // Safety stop
+          if (page > 20) {
+            break;
+          }
+        }
 
         const greekEvents = allEvents.filter(event => {
           const country = String(
@@ -65,14 +96,16 @@ export default {
             country === "greece" ||
             country === "hellas" ||
             country === "ελλάδα" ||
-            address.includes("greece")
+            address.includes("greece") ||
+            address.includes("ελλάδα")
           );
         });
 
         return Response.json({
           success: true,
-          locator_total_in_search_area: data.total ?? null,
-          events_returned: allEvents.length,
+          locator_total: total,
+          pages_checked: page,
+          events_downloaded: allEvents.length,
           greek_events_found: greekEvents.length,
           greek_events: greekEvents.map(event => ({
             id: event.id,
@@ -86,6 +119,7 @@ export default {
             country: event.store?.country || null
           }))
         });
+
       } catch (error) {
         return Response.json(
           {
@@ -97,7 +131,7 @@ export default {
       }
     }
 
-    // Κανονικό API της δικής μας βάσης
+    // Events από τη δική μας βάση
     if (url.pathname === "/api/events") {
       const { results } = await env.DB
         .prepare(`
