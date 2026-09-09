@@ -1541,10 +1541,54 @@ cursor: pointer;
 
     }
 
+function canonicalCityName(city) {
+
+  const value =
+    String(city || "").trim();
+
+  const key =
+    normalize(value);
+
+  const cityMap = {
+    "athens": "Αθήνα",
+    "athina": "Αθήνα",
+    "αθηνα": "Αθήνα",
+
+    "iraklio": "Ηράκλειο",
+    "ηρακλειο": "Ηράκλειο",
+
+    "thessaloniki": "Θεσσαλονίκη",
+    "θεσσαλονικη": "Θεσσαλονίκη",
+
+    "chania": "Χανιά",
+    "corfu": "Κέρκυρα",
+    "chalandri": "Χαλάνδρι",
+    "ag. dimitrios": "Άγιος Δημήτριος",
+    "egaleo": "Αιγάλεω",
+    "galatsi": "Γαλάτσι",
+    "kalamaria": "Καλαμαριά",
+    "kalamata": "Καλαμάτα",
+    "kallithea": "Καλλιθέα",
+    "koridallos": "Κορυδαλλός",
+    "lamia": "Λαμία",
+    "marousi": "Μαρούσι",
+    "nea erithrea": "Νέα Ερυθραία",
+    "neo irakleio": "Νέο Ηράκλειο",
+    "patra": "Πάτρα",
+    "peristeri": "Περιστέρι",
+    "pireas": "Πειραιάς",
+    "serres": "Σέρρες",
+    "thermi": "Θέρμη",
+    "volos": "Βόλος"
+  };
+
+  return cityMap[key] || value;
+}
+    
     function getEventCity(event) {
 
   if (event.city) {
-    return String(event.city).trim();
+    return canonicalCityName(event.city);
   }
 
   const address =
@@ -1607,7 +1651,7 @@ cursor: pointer;
         .trim();
 
     if (part) {
-      return part;
+      return canonicalCityName(part);
     }
 
   }
