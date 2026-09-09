@@ -1,8 +1,36 @@
 export default {
   async fetch(request, env, ctx) {
-    const result = await env.DB
-      .prepare("SELECT COUNT(*) AS count FROM events")
-      .first();
+    const { results } = await env.DB
+      .prepare(`
+        SELECT
+          title,
+          store_name,
+          city,
+          event_type,
+          start_time,
+          event_url
+        FROM events
+        WHERE status = 'active'
+        ORDER BY start_time ASC
+      `)
+      .all();
+
+    const eventsHtml = results.length
+      ? results.map(event => `
+          <article>
+            <h2>${event.title}</h2>
+            <p><strong>Κατάστημα:</strong> ${event.store_name || "-"}</p>
+            <p><strong>Πόλη:</strong> ${event.city || "-"}</p>
+            <p><strong>Τύπος:</strong> ${event.event_type || "-"}</p>
+            <p><strong>Ημερομηνία:</strong> ${event.start_time || "-"}</p>
+            ${
+              event.event_url
+                ? `<p><a href="${event.event_url}" target="_blank">Δες το event</a></p>`
+                : ""
+            }
+          </article>
+        `).join("")
+      : "<p>Δεν υπάρχουν διαθέσιμα events.</p>";
 
     const html = `
 <!DOCTYPE html>
@@ -14,8 +42,8 @@ export default {
 </head>
 <body>
   <h1>Riftbound Events Greece</h1>
-  <p>Η βάση δεδομένων λειτουργεί!</p>
-  <p>Events στη βάση: ${result.count}</p>
+
+  ${eventsHtml}
 </body>
 </html>
     `;
