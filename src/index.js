@@ -4,6 +4,7 @@ const LOCATOR_API =
 const PAGE_SIZE = 250;
 
 
+
 async function fetchAllLocatorEvents() {
   const startDate = new Date();
 
@@ -151,6 +152,14 @@ function isGreekEvent(event) {
 
 
 function safeCoordinate(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
   const number =
     Number(value);
 
@@ -180,14 +189,18 @@ async function syncGreekEvents(
         const externalId =
           `legacy:${event.id}`;
 
+
         const latitude =
           safeCoordinate(
-            event.latitude
+            event.latitude ??
+            event.store?.latitude
           );
+
 
         const longitude =
           safeCoordinate(
-            event.longitude
+            event.longitude ??
+            event.store?.longitude
           );
 
 
