@@ -542,7 +542,7 @@
 
       gap: 12px;
 
-      margin-bottom: 36px;
+      margin-bottom: 14px;
     }
 
     .field {
@@ -586,6 +586,135 @@
       transform: translateY(-50%);
 
       color: #958e99;
+    }
+
+
+    /* PROXIMITY */
+
+    .proximity-panel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 18px;
+
+      margin-bottom: 36px;
+
+      padding: 13px 15px;
+
+      background: white;
+
+      border: 1px solid var(--border);
+      border-radius: 16px;
+
+      box-shadow:
+        0 8px 24px rgba(38,26,46,.035);
+    }
+
+    .proximity-controls {
+      display: flex;
+      align-items: center;
+
+      gap: 10px;
+    }
+
+    .nearby-button {
+      height: 44px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 7px;
+
+      padding: 0 16px;
+
+      background: #f7f2fb;
+      color: var(--purple-dark);
+
+      border: 1px solid #dfcbea;
+      border-radius: 12px;
+
+      font-size: 12px;
+      font-weight: 800;
+
+      white-space: nowrap;
+
+      transition:
+        background .2s ease,
+        color .2s ease,
+        border-color .2s ease;
+    }
+
+    .nearby-button:hover {
+      background: var(--purple-light);
+    }
+
+    .nearby-button.active {
+      background: var(--purple);
+      color: white;
+
+      border-color: var(--purple);
+    }
+
+    .nearby-button:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .radius-select {
+      height: 44px;
+
+      min-width: 140px;
+
+      padding: 0 12px;
+
+      background: white;
+      color: var(--text);
+
+      border: 1px solid var(--border);
+      border-radius: 12px;
+
+      outline: none;
+
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .radius-select:disabled {
+      color: #aaa5ad;
+      background: #f6f5f7;
+
+      cursor: not-allowed;
+    }
+
+    .radius-select:focus {
+      border-color: rgba(101,25,168,.5);
+
+      box-shadow:
+        0 0 0 4px rgba(101,25,168,.07);
+    }
+
+    .location-status {
+      color: var(--muted);
+
+      font-size: 11px;
+      line-height: 1.45;
+
+      text-align: right;
+    }
+
+    .location-status.active {
+      color: #625269;
+    }
+
+    .location-status.error {
+      color: #a63d3d;
+    }
+
+    .distance-meta {
+      color: var(--purple-dark);
+      font-weight: 700;
     }
 
 
@@ -1449,6 +1578,24 @@
         grid-template-columns: 1fr;
       }
 
+      .proximity-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .proximity-controls {
+        width: 100%;
+      }
+
+      .nearby-button,
+      .radius-select {
+        flex: 1;
+      }
+
+      .location-status {
+        text-align: left;
+      }
+
       .event-card {
         grid-template-columns:
           64px minmax(0,1fr);
@@ -1826,6 +1973,60 @@
 
 
 
+  <div class="proximity-panel">
+
+    <div class="proximity-controls">
+
+      <button
+        class="nearby-button"
+        id="nearby-button"
+        type="button"
+      >
+        📍 Κοντά μου
+      </button>
+
+
+      <select
+        class="radius-select"
+        id="radius-filter"
+        disabled
+        aria-label="Ακτίνα απόστασης"
+      >
+        <option value="25">
+          Έως 25 km
+        </option>
+
+        <option value="50" selected>
+          Έως 50 km
+        </option>
+
+        <option value="100">
+          Έως 100 km
+        </option>
+
+        <option value="200">
+          Έως 200 km
+        </option>
+
+        <option value="all">
+          Όλα
+        </option>
+      </select>
+
+    </div>
+
+
+    <div
+      class="location-status"
+      id="location-status"
+    >
+      Βρες events κοντά στην τοποθεσία σου.
+    </div>
+
+  </div>
+
+
+
   <div id="list-view">
 
     <div id="events">
@@ -2001,6 +2202,14 @@ let calendarMonth;
 let selectedCalendarDateKey = null;
 
 
+/*
+  PROXIMITY
+*/
+
+let userLocation = null;
+let proximityEnabled = false;
+
+
 
 /* HELPERS */
 
@@ -2172,6 +2381,450 @@ async function loadSyncStatus() {
     text.textContent =
       "Τελευταία ενημέρωση: —";
   }
+}
+
+
+
+/* PROXIMITY */
+
+function getEventCoordinates(event) {
+  const latitude =
+    Number(event.latitude);
+
+  const longitude =
+    Number(event.longitude);
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude)
+  ) {
+    return null;
+  }
+
+  if (
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    return null;
+  }
+
+  return {
+    latitude,
+    longitude
+  };
+}
+
+
+
+function degreesToRadians(value) {
+  return (
+    value *
+    Math.PI /
+    180
+  );
+}
+
+
+
+function calculateDistanceKm(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
+  const EARTH_RADIUS_KM =
+    6371;
+
+  const latitudeDifference =
+    degreesToRadians(
+      lat2 - lat1
+    );
+
+  const longitudeDifference =
+    degreesToRadians(
+      lon2 - lon1
+    );
+
+  const firstLatitude =
+    degreesToRadians(
+      lat1
+    );
+
+  const secondLatitude =
+    degreesToRadians(
+      lat2
+    );
+
+  const a =
+    Math.sin(
+      latitudeDifference / 2
+    ) ** 2
+    +
+    Math.cos(firstLatitude)
+    *
+    Math.cos(secondLatitude)
+    *
+    Math.sin(
+      longitudeDifference / 2
+    ) ** 2;
+
+  const c =
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    );
+
+  return (
+    EARTH_RADIUS_KM *
+    c
+  );
+}
+
+
+
+function getEventDistance(event) {
+  if (!userLocation) {
+    return null;
+  }
+
+  const coordinates =
+    getEventCoordinates(event);
+
+  if (!coordinates) {
+    return null;
+  }
+
+  return calculateDistanceKm(
+    userLocation.latitude,
+    userLocation.longitude,
+    coordinates.latitude,
+    coordinates.longitude
+  );
+}
+
+
+
+function formatDistance(distance) {
+  if (
+    distance === null ||
+    !Number.isFinite(distance)
+  ) {
+    return "";
+  }
+
+  if (distance < 1) {
+    return (
+      Math.round(
+        distance * 1000
+      )
+      + " m"
+    );
+  }
+
+  return (
+    new Intl.NumberFormat(
+      "el-GR",
+      {
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 0
+      }
+    )
+    .format(distance)
+    + " km"
+  );
+}
+
+
+
+function getSelectedRadius() {
+  const value =
+    document
+      .getElementById(
+        "radius-filter"
+      )
+      .value;
+
+  if (
+    value === "all"
+  ) {
+    return null;
+  }
+
+  const radius =
+    Number(value);
+
+  return Number.isFinite(radius)
+    ? radius
+    : 50;
+}
+
+
+
+function eventMatchesProximity(event) {
+  if (!proximityEnabled) {
+    return true;
+  }
+
+  const distance =
+    getEventDistance(event);
+
+  if (distance === null) {
+    return false;
+  }
+
+  const radius =
+    getSelectedRadius();
+
+  if (radius === null) {
+    return true;
+  }
+
+  return (
+    distance <= radius
+  );
+}
+
+
+
+function proximityResultLabel() {
+  if (!proximityEnabled) {
+    return "";
+  }
+
+  const radius =
+    getSelectedRadius();
+
+  if (radius === null) {
+    return " κοντά σου";
+  }
+
+  return (
+    ` σε ακτίνα ${radius} km`
+  );
+}
+
+
+
+function updateLocationStatus() {
+  const status =
+    document.getElementById(
+      "location-status"
+    );
+
+  if (!proximityEnabled) {
+    status.className =
+      "location-status";
+
+    status.textContent =
+      "Βρες events κοντά στην τοποθεσία σου.";
+
+    return;
+  }
+
+  const radius =
+    getSelectedRadius();
+
+  status.className =
+    "location-status active";
+
+  if (radius === null) {
+    status.textContent =
+      "Εμφανίζονται όλα τα events με την απόστασή τους από εσένα. Η τοποθεσία δεν αποθηκεύεται.";
+  }
+
+  else {
+    status.textContent =
+      `Εμφανίζονται events έως ${radius} km από εσένα. Η τοποθεσία δεν αποθηκεύεται.`;
+  }
+}
+
+
+
+function disableProximity() {
+  proximityEnabled =
+    false;
+
+  userLocation =
+    null;
+
+  const button =
+    document.getElementById(
+      "nearby-button"
+    );
+
+  const radius =
+    document.getElementById(
+      "radius-filter"
+    );
+
+  button.disabled =
+    false;
+
+  button.classList.remove(
+    "active"
+  );
+
+  button.textContent =
+    "📍 Κοντά μου";
+
+  radius.disabled =
+    true;
+
+  updateLocationStatus();
+
+  applyFilters();
+}
+
+
+
+function requestNearbyEvents() {
+  if (proximityEnabled) {
+    disableProximity();
+    return;
+  }
+
+
+  const button =
+    document.getElementById(
+      "nearby-button"
+    );
+
+  const radius =
+    document.getElementById(
+      "radius-filter"
+    );
+
+  const status =
+    document.getElementById(
+      "location-status"
+    );
+
+
+  if (
+    !navigator.geolocation
+  ) {
+    status.className =
+      "location-status error";
+
+    status.textContent =
+      "Ο browser σου δεν υποστηρίζει εντοπισμό τοποθεσίας.";
+
+    return;
+  }
+
+
+  button.disabled =
+    true;
+
+  button.textContent =
+    "📍 Εντοπισμός...";
+
+  status.className =
+    "location-status";
+
+  status.textContent =
+    "Ζητείται η άδεια τοποθεσίας από τον browser...";
+
+
+  navigator.geolocation.getCurrentPosition(
+    position => {
+      userLocation = {
+        latitude:
+          position.coords.latitude,
+
+        longitude:
+          position.coords.longitude
+      };
+
+      proximityEnabled =
+        true;
+
+      button.disabled =
+        false;
+
+      button.classList.add(
+        "active"
+      );
+
+      button.textContent =
+        "✓ Κοντά μου";
+
+      radius.disabled =
+        false;
+
+      updateLocationStatus();
+
+      applyFilters();
+    },
+
+    error => {
+      userLocation =
+        null;
+
+      proximityEnabled =
+        false;
+
+      button.disabled =
+        false;
+
+      button.classList.remove(
+        "active"
+      );
+
+      button.textContent =
+        "📍 Κοντά μου";
+
+      radius.disabled =
+        true;
+
+      status.className =
+        "location-status error";
+
+
+      if (
+        error.code ===
+        error.PERMISSION_DENIED
+      ) {
+        status.textContent =
+          "Δεν δόθηκε άδεια τοποθεσίας. Τα events συνεχίζουν να εμφανίζονται κανονικά.";
+      }
+
+      else if (
+        error.code ===
+        error.POSITION_UNAVAILABLE
+      ) {
+        status.textContent =
+          "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
+      }
+
+      else if (
+        error.code ===
+        error.TIMEOUT
+      ) {
+        status.textContent =
+          "Ο εντοπισμός τοποθεσίας άργησε πολύ. Δοκίμασε ξανά.";
+      }
+
+      else {
+        status.textContent =
+          "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
+      }
+    },
+
+    {
+      enableHighAccuracy:
+        false,
+
+      timeout:
+        12000,
+
+      maximumAge:
+        300000
+    }
+  );
 }
 
 
@@ -2786,6 +3439,8 @@ function eventMatchesFilters(
       !type ||
       eventType === type
     )
+    &&
+    eventMatchesProximity(event)
   );
 }
 
@@ -2939,6 +3594,11 @@ function createEventCard(event) {
   const past =
     isPastEvent(event);
 
+  const distance =
+    proximityEnabled
+      ? getEventDistance(event)
+      : null;
+
   const tagName =
     url
       ? "a"
@@ -3041,6 +3701,31 @@ function createEventCard(event) {
 
           </span>
 
+
+          ${
+            distance !== null
+              ? `
+                  <span
+                    class="
+                      meta-item
+                      distance-meta
+                    "
+                  >
+                    <span class="meta-icon">
+                      📍
+                    </span>
+
+                    ${escapeHTML(
+                      formatDistance(
+                        distance
+                      )
+                    )}
+                    μακριά
+                  </span>
+                `
+              : ""
+          }
+
         </div>
 
 
@@ -3079,8 +3764,11 @@ function renderListView() {
     container.innerHTML =
       `
         <div class="status-card">
-          Δεν βρέθηκαν events
-          με αυτά τα φίλτρα.
+          ${
+            proximityEnabled
+              ? "Δεν βρέθηκαν events στην επιλεγμένη ακτίνα."
+              : "Δεν βρέθηκαν events με αυτά τα φίλτρα."
+          }
         </div>
       `;
 
@@ -3130,6 +3818,40 @@ function renderListView() {
         .push(event);
     }
   );
+
+
+  if (proximityEnabled) {
+    groups.forEach(
+      group => {
+        group.events.sort(
+          (a,b) => {
+            const aDistance =
+              getEventDistance(a);
+
+            const bDistance =
+              getEventDistance(b);
+
+            if (
+              aDistance === null
+            ) {
+              return 1;
+            }
+
+            if (
+              bDistance === null
+            ) {
+              return -1;
+            }
+
+            return (
+              aDistance -
+              bDistance
+            );
+          }
+        );
+      }
+    );
+  }
 
 
   let html = "";
@@ -3234,6 +3956,41 @@ function eventsByDate() {
     }
   );
 
+
+  if (proximityEnabled) {
+    map.forEach(
+      events => {
+        events.sort(
+          (a,b) => {
+            const aDistance =
+              getEventDistance(a);
+
+            const bDistance =
+              getEventDistance(b);
+
+            if (
+              aDistance === null
+            ) {
+              return 1;
+            }
+
+            if (
+              bDistance === null
+            ) {
+              return -1;
+            }
+
+            return (
+              aDistance -
+              bDistance
+            );
+          }
+        );
+      }
+    );
+  }
+
+
   return map;
 }
 
@@ -3326,7 +4083,12 @@ function renderSelectedCalendarDay(map) {
       `
         <div class="status-card">
           Δεν υπάρχουν καταγεγραμμένα
-          events αυτή την ημέρα.
+          events αυτή την ημέρα
+          ${
+            proximityEnabled
+              ? "στην επιλεγμένη ακτίνα."
+              : "."
+          }
         </div>
       `;
 
@@ -3652,7 +4414,7 @@ function renderCurrentView() {
     currentView === "calendar"
   ) {
     resultCount.textContent =
-      `${filteredCalendarEvents.length} καταγεγραμμένα events`;
+      `${filteredCalendarEvents.length} καταγεγραμμένα events${proximityResultLabel()}`;
 
     listView.style.display =
       "none";
@@ -3680,7 +4442,7 @@ function renderCurrentView() {
 
   else {
     resultCount.textContent =
-      `${filteredUpcomingEvents.length} events`;
+      `${filteredUpcomingEvents.length} events${proximityResultLabel()}`;
 
     listView.style.display =
       "block";
@@ -3904,6 +4666,29 @@ document
   .addEventListener(
     "change",
     applyFilters
+  );
+
+
+document
+  .getElementById(
+    "nearby-button"
+  )
+  .addEventListener(
+    "click",
+    requestNearbyEvents
+  );
+
+
+document
+  .getElementById(
+    "radius-filter"
+  )
+  .addEventListener(
+    "change",
+    () => {
+      updateLocationStatus();
+      applyFilters();
+    }
   );
 
 
