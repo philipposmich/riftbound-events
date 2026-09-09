@@ -20,6 +20,7 @@
   >
 
   <style>
+
     :root {
       --bg: #f7f7f8;
       --surface: #ffffff;
@@ -36,8 +37,6 @@
       --gold: #dba92e;
       --gold-light: #fff5d8;
 
-      --orange: #dc6322;
-
       --shadow:
         0 18px 45px rgba(41, 28, 52, 0.07);
 
@@ -45,31 +44,40 @@
       --container: 1180px;
     }
 
+
     * {
       box-sizing: border-box;
     }
+
 
     html {
       scroll-behavior: smooth;
     }
 
+
     body {
       margin: 0;
+
       background: var(--bg);
       color: var(--text);
+
       font-family: "Inter", sans-serif;
+
       -webkit-font-smoothing: antialiased;
     }
+
 
     a {
       color: inherit;
     }
+
 
     button,
     input,
     select {
       font: inherit;
     }
+
 
     .container {
       width: min(
@@ -80,20 +88,24 @@
       margin: 0 auto;
     }
 
-    /* ------------------------------
+
+    /* ---------------------------------
        HEADER
-    ------------------------------ */
+    --------------------------------- */
 
     .site-header {
-      background: rgba(255,255,255,.94);
-      border-bottom: 1px solid var(--border);
       position: sticky;
       top: 0;
       z-index: 50;
 
+      background: rgba(255, 255, 255, .95);
+
+      border-bottom: 1px solid var(--border);
+
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
+
 
     .header-inner {
       min-height: 82px;
@@ -105,6 +117,7 @@
       gap: 24px;
     }
 
+
     .brand {
       display: flex;
       align-items: center;
@@ -113,58 +126,71 @@
       min-width: 0;
     }
 
+
     .brand-logo {
       display: block;
+
       width: 300px;
       max-width: 52vw;
+
       height: auto;
     }
+
 
     .brand-divider {
       width: 1px;
       height: 30px;
+
       background: var(--border);
     }
 
+
     .brand-label {
+      color: var(--purple);
+
       font-size: 13px;
       font-weight: 800;
+
       letter-spacing: .09em;
       text-transform: uppercase;
 
-      color: var(--purple);
       white-space: nowrap;
     }
 
-    .back-link {
-      text-decoration: none;
 
+    .back-link {
       display: inline-flex;
       align-items: center;
       gap: 8px;
 
+      color: #49444d;
+
       font-size: 14px;
       font-weight: 700;
 
-      color: #49444d;
+      text-decoration: none;
 
       transition: .2s ease;
     }
+
 
     .back-link:hover {
       color: var(--purple);
     }
 
-    /* ------------------------------
+
+    /* ---------------------------------
        HERO
-    ------------------------------ */
+    --------------------------------- */
 
     .hero {
       padding: 48px 0 32px;
     }
 
+
     .hero-panel {
       position: relative;
+
       overflow: hidden;
 
       min-height: 370px;
@@ -191,10 +217,12 @@
       box-shadow: var(--shadow);
     }
 
+
     .hero-panel::before {
       content: "";
 
       position: absolute;
+
       width: 300px;
       height: 300px;
 
@@ -206,10 +234,11 @@
       background:
         radial-gradient(
           circle,
-          rgba(219,169,46,.3),
-          rgba(219,169,46,0)
+          rgba(219, 169, 46, .30),
+          rgba(219, 169, 46, 0)
         );
     }
+
 
     .hero-copy {
       position: relative;
@@ -222,6 +251,7 @@
       justify-content: center;
     }
 
+
     .eyebrow {
       display: inline-flex;
       align-items: center;
@@ -229,26 +259,30 @@
 
       width: fit-content;
 
+      margin-bottom: 18px;
+
       color: var(--purple);
 
       font-size: 12px;
       font-weight: 800;
+
       letter-spacing: .11em;
       text-transform: uppercase;
-
-      margin-bottom: 18px;
     }
+
 
     .eyebrow-dot {
       width: 9px;
       height: 9px;
+
       border-radius: 50%;
 
       background: var(--gold);
 
       box-shadow:
-        0 0 0 5px rgba(219,169,46,.15);
+        0 0 0 5px rgba(219, 169, 46, .15);
     }
+
 
     .hero h1 {
       margin: 0;
@@ -256,14 +290,18 @@
       max-width: 670px;
 
       font-family: "Roboto Slab", serif;
+
       font-size: clamp(38px, 5vw, 62px);
       line-height: 1.04;
+
       letter-spacing: -.035em;
     }
+
 
     .hero h1 span {
       color: var(--purple);
     }
+
 
     .hero-description {
       margin: 22px 0 0;
@@ -276,14 +314,15 @@
       line-height: 1.7;
     }
 
-    .sync-note {
-      margin-top: 28px;
 
+    .sync-note {
       display: inline-flex;
       align-items: center;
       gap: 10px;
 
       width: fit-content;
+
+      margin-top: 28px;
 
       padding: 10px 14px;
 
@@ -298,20 +337,23 @@
       font-weight: 600;
     }
 
+
     .sync-light {
       width: 8px;
       height: 8px;
+
       border-radius: 50%;
 
       background: #2faa68;
 
       box-shadow:
-        0 0 0 4px rgba(47,170,104,.12);
+        0 0 0 4px rgba(47, 170, 104, .12);
     }
 
-    /* ------------------------------
-       RIFTY HERO
-    ------------------------------ */
+
+    /* ---------------------------------
+       RIFTY
+    --------------------------------- */
 
     .hero-rifty {
       position: relative;
@@ -322,6 +364,7 @@
 
       overflow: hidden;
     }
+
 
     .magic-orb {
       position: absolute;
@@ -347,132 +390,65 @@
       transform: translateY(45px);
     }
 
+
     .magic-ring {
       position: absolute;
 
       width: 345px;
       height: 345px;
 
-      border: 1px solid rgba(107,28,170,.22);
+      border: 1px solid rgba(107, 28, 170, .22);
       border-radius: 50%;
 
       transform: translateY(55px);
     }
 
+
     .magic-ring::before,
     .magic-ring::after {
       content: "";
+
       position: absolute;
 
-      border: 1px solid rgba(219,169,46,.22);
+      border: 1px solid rgba(219, 169, 46, .22);
       border-radius: 50%;
     }
+
 
     .magic-ring::before {
       inset: 28px;
     }
 
+
     .magic-ring::after {
       inset: 65px;
     }
+
 
     .rifty-placeholder {
       position: relative;
       z-index: 2;
 
-      width: 270px;
-      height: 290px;
+      display: block;
 
-      margin-bottom: -25px;
+      width: 320px;
+      height: 320px;
+
+      margin-bottom: -42px;
+
+      object-fit: cover;
+      object-position: center 14%;
 
       border-radius: 50% 50% 24px 24px;
 
-      background:
-        linear-gradient(
-          145deg,
-          rgba(85,16,145,.92),
-          rgba(38,6,68,.98)
-        );
-
       box-shadow:
-        0 30px 60px rgba(65,13,109,.25);
-
-      overflow: hidden;
+        0 30px 60px rgba(65, 13, 109, .25);
     }
 
-    .rifty-placeholder::before {
-      content: "";
 
-      position: absolute;
-      width: 185px;
-      height: 120px;
-
-      left: 50%;
-      top: 58px;
-
-      transform: translateX(-50%);
-
-      background: #0b0810;
-
-      border-radius: 52% 52% 44% 44%;
-
-      border: 10px solid #dca82d;
-    }
-
-    .rifty-eye {
-      position: absolute;
-      top: 105px;
-
-      width: 25px;
-      height: 38px;
-
-      background: #fff848;
-
-      border-radius: 50%;
-
-      box-shadow:
-        0 0 20px rgba(255,248,72,.65);
-
-      z-index: 4;
-    }
-
-    .rifty-eye.one {
-      left: 94px;
-    }
-
-    .rifty-eye.two {
-      right: 94px;
-    }
-
-    .rifty-mini-label {
-      position: absolute;
-
-      bottom: 28px;
-      left: 50%;
-
-      transform: translateX(-50%);
-
-      width: max-content;
-
-      padding: 8px 12px;
-
-      border-radius: 999px;
-
-      background: rgba(255,255,255,.92);
-
-      color: var(--purple-dark);
-
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-
-      z-index: 5;
-    }
-
-    /* ------------------------------
+    /* ---------------------------------
        STATS
-    ------------------------------ */
+    --------------------------------- */
 
     .stats {
       display: grid;
@@ -483,29 +459,33 @@
       margin-top: 18px;
     }
 
+
     .stat-card {
+      padding: 22px 24px;
+
       background: var(--surface);
 
       border: 1px solid var(--border);
       border-radius: 18px;
 
-      padding: 22px 24px;
-
       box-shadow:
-        0 10px 30px rgba(38,26,46,.04);
+        0 10px 30px rgba(38, 26, 46, .04);
     }
+
 
     .stat-number {
       display: block;
 
-      font-family: "Roboto Slab", serif;
-      font-size: 28px;
-      line-height: 1;
+      margin-bottom: 7px;
 
       color: var(--purple-dark);
 
-      margin-bottom: 7px;
+      font-family: "Roboto Slab", serif;
+
+      font-size: 28px;
+      line-height: 1;
     }
+
 
     .stat-label {
       color: var(--muted);
@@ -517,13 +497,15 @@
       letter-spacing: .065em;
     }
 
-    /* ------------------------------
-       EVENTS TOOLBAR
-    ------------------------------ */
+
+    /* ---------------------------------
+       EVENTS SECTION
+    --------------------------------- */
 
     .events-section {
       padding: 35px 0 80px;
     }
+
 
     .events-heading {
       display: flex;
@@ -535,19 +517,24 @@
       margin-bottom: 24px;
     }
 
+
     .events-heading h2 {
       margin: 0;
 
       font-family: "Roboto Slab", serif;
+
       font-size: 30px;
     }
+
 
     .events-heading p {
       margin: 7px 0 0;
 
       color: var(--muted);
+
       font-size: 14px;
     }
+
 
     .result-count {
       color: var(--purple);
@@ -555,6 +542,11 @@
       font-size: 13px;
       font-weight: 800;
     }
+
+
+    /* ---------------------------------
+       FILTERS
+    --------------------------------- */
 
     .toolbar {
       display: grid;
@@ -569,40 +561,44 @@
       margin-bottom: 36px;
     }
 
+
     .field {
       position: relative;
     }
+
 
     .field input,
     .field select {
       width: 100%;
       height: 52px;
 
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      padding: 0 16px;
 
       background: white;
-
       color: var(--text);
 
-      padding: 0 16px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
 
       outline: none;
 
       transition: .2s ease;
     }
 
+
     .field input {
       padding-left: 45px;
     }
 
+
     .field input:focus,
     .field select:focus {
-      border-color: rgba(101,25,168,.5);
+      border-color: rgba(101, 25, 168, .5);
 
       box-shadow:
-        0 0 0 4px rgba(101,25,168,.07);
+        0 0 0 4px rgba(101, 25, 168, .07);
     }
+
 
     .search-icon {
       position: absolute;
@@ -615,13 +611,15 @@
       color: #958e99;
     }
 
-    /* ------------------------------
+
+    /* ---------------------------------
        DATE GROUPS
-    ------------------------------ */
+    --------------------------------- */
 
     .date-group {
       margin-bottom: 42px;
     }
+
 
     .date-heading {
       display: flex;
@@ -631,25 +629,30 @@
       margin-bottom: 17px;
     }
 
+
     .date-heading h3 {
       margin: 0;
 
       white-space: nowrap;
+
+      color: #3d3740;
 
       font-size: 14px;
       font-weight: 800;
 
       text-transform: uppercase;
       letter-spacing: .08em;
-
-      color: #3d3740;
     }
+
 
     .date-line {
       height: 1px;
+
       background: var(--border);
+
       flex: 1;
     }
+
 
     .event-grid {
       display: grid;
@@ -658,15 +661,12 @@
       gap: 14px;
     }
 
-    /* ------------------------------
-       EVENT CARD
-    ------------------------------ */
+
+    /* ---------------------------------
+       EVENT CARDS
+    --------------------------------- */
 
     .event-card {
-      text-decoration: none;
-color: inherit;
-cursor: pointer;
-      
       position: relative;
 
       display: grid;
@@ -676,12 +676,18 @@ cursor: pointer;
 
       min-height: 160px;
 
-      background: white;
-
       padding: 20px;
+
+      background: white;
 
       border: 1px solid var(--border);
       border-radius: 18px;
+
+      color: inherit;
+
+      text-decoration: none;
+
+      cursor: pointer;
 
       transition:
         transform .2s ease,
@@ -689,20 +695,25 @@ cursor: pointer;
         border-color .2s ease;
     }
 
+
     .event-card:hover {
       transform: translateY(-2px);
 
-      border-color: rgba(101,25,168,.22);
+      border-color: rgba(101, 25, 168, .22);
 
       box-shadow:
-        0 18px 42px rgba(48,29,61,.08);
+        0 18px 42px rgba(48, 29, 61, .08);
     }
+
 
     .event-date-box {
       width: 78px;
       height: 88px;
 
-      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
 
       background:
         linear-gradient(
@@ -712,20 +723,19 @@ cursor: pointer;
         );
 
       border: 1px solid #eadcf4;
-
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      border-radius: 15px;
     }
+
 
     .event-day {
+      color: var(--purple-dark);
+
       font-family: "Roboto Slab", serif;
+
       font-size: 30px;
       line-height: 1;
-
-      color: var(--purple-dark);
     }
+
 
     .event-month {
       margin-top: 5px;
@@ -739,20 +749,16 @@ cursor: pointer;
       letter-spacing: .08em;
     }
 
+
     .event-content {
       min-width: 0;
     }
 
-    .event-topline {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-
-      gap: 14px;
-    }
 
     .event-type {
       display: inline-flex;
+
+      margin-bottom: 10px;
 
       padding: 5px 8px;
 
@@ -768,17 +774,18 @@ cursor: pointer;
 
       letter-spacing: .07em;
       text-transform: uppercase;
-
-      margin-bottom: 10px;
     }
+
 
     .event-title {
       margin: 0;
 
       font-family: "Roboto Slab", serif;
+
       font-size: 18px;
       line-height: 1.35;
     }
+
 
     .event-meta {
       display: flex;
@@ -789,8 +796,10 @@ cursor: pointer;
       margin-top: 13px;
 
       color: var(--muted);
+
       font-size: 12px;
     }
+
 
     .meta-item {
       display: inline-flex;
@@ -798,9 +807,11 @@ cursor: pointer;
       gap: 6px;
     }
 
+
     .meta-icon {
       color: var(--purple);
     }
+
 
     .event-link {
       display: inline-flex;
@@ -811,17 +822,17 @@ cursor: pointer;
 
       font-size: 12px;
       font-weight: 800;
-
-      text-decoration: none;
     }
 
-    .event-link:hover {
+
+    .event-card:hover .event-link {
       text-decoration: underline;
     }
 
-    /* ------------------------------
-       STATUS / EMPTY
-    ------------------------------ */
+
+    /* ---------------------------------
+       STATUS
+    --------------------------------- */
 
     .status-card {
       padding: 45px 25px;
@@ -836,25 +847,27 @@ cursor: pointer;
       color: var(--muted);
     }
 
+
     .loader {
       width: 32px;
       height: 32px;
 
+      margin: 0 auto 14px;
+
       border: 3px solid #eee5f4;
       border-top-color: var(--purple);
-
       border-radius: 50%;
-
-      margin: 0 auto 14px;
 
       animation: spin .75s linear infinite;
     }
+
 
     @keyframes spin {
       to {
         transform: rotate(360deg);
       }
     }
+
 
     .load-more {
       display: none;
@@ -863,37 +876,40 @@ cursor: pointer;
 
       padding: 13px 20px;
 
+      background: white;
+      color: var(--purple);
+
       border: 1px solid var(--border);
       border-radius: 999px;
 
-      background: white;
-
-      color: var(--purple);
-
-      font-weight: 800;
       font-size: 13px;
+      font-weight: 800;
 
       cursor: pointer;
 
       transition: .2s ease;
     }
 
+
     .load-more:hover {
-      border-color: var(--purple);
       background: var(--purple-light);
+
+      border-color: var(--purple);
     }
 
-    /* ------------------------------
+
+    /* ---------------------------------
        FOOTER
-    ------------------------------ */
+    --------------------------------- */
 
     footer {
+      padding: 32px 0;
+
       background: white;
 
       border-top: 1px solid var(--border);
-
-      padding: 32px 0;
     }
+
 
     .footer-inner {
       display: flex;
@@ -903,42 +919,48 @@ cursor: pointer;
       gap: 20px;
 
       color: var(--muted);
+
       font-size: 12px;
     }
 
+
     .footer-brand {
       color: var(--text);
+
       font-weight: 800;
     }
 
-    /* ------------------------------
+
+    /* ---------------------------------
        RESPONSIVE
-    ------------------------------ */
+    --------------------------------- */
 
     @media (max-width: 900px) {
+
       .hero-panel {
         grid-template-columns: 1fr;
       }
 
+
       .hero-copy {
-        padding:
-          42px 32px 20px;
+        padding: 42px 32px 20px;
       }
+
 
       .hero-rifty {
         min-height: 260px;
       }
 
-      .rifty-placeholder {
-        height: 250px;
-      }
 
       .event-grid {
         grid-template-columns: 1fr;
       }
+
     }
 
+
     @media (max-width: 720px) {
+
       .container {
         width: min(
           calc(100% - 24px),
@@ -946,123 +968,157 @@ cursor: pointer;
         );
       }
 
+
       .header-inner {
         min-height: 70px;
       }
 
+
       .brand-logo {
         width: 180px;
       }
+
 
       .brand-divider,
       .brand-label {
         display: none;
       }
 
+
       .back-link span {
         display: none;
       }
+
 
       .hero {
         padding-top: 20px;
       }
 
+
       .hero-panel {
         border-radius: 22px;
       }
 
+
       .hero-copy {
-        padding:
-          36px 24px 15px;
+        padding: 36px 24px 15px;
       }
+
 
       .hero h1 {
         font-size: 39px;
       }
 
+
       .hero-description {
         font-size: 15px;
       }
+
 
       .hero-rifty {
         min-height: 230px;
       }
 
+
+      .rifty-placeholder {
+        width: 320px;
+        height: 320px;
+      }
+
+
       .stats {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: repeat(3, 1fr);
+
         gap: 8px;
       }
 
+
       .stat-card {
         padding: 17px 12px;
+
         text-align: center;
       }
+
 
       .stat-number {
         font-size: 23px;
       }
 
+
       .stat-label {
         font-size: 9px;
       }
 
+
       .events-section {
         padding-top: 25px;
       }
+
 
       .events-heading {
         align-items: flex-start;
         flex-direction: column;
       }
 
+
       .toolbar {
         grid-template-columns: 1fr;
       }
 
+
       .event-card {
         grid-template-columns: 64px 1fr;
 
-        padding: 15px;
-
         gap: 14px;
+
+        padding: 15px;
       }
+
 
       .event-date-box {
         width: 64px;
         height: 76px;
       }
 
+
       .event-day {
         font-size: 25px;
       }
+
 
       .event-title {
         font-size: 16px;
       }
 
+
       .footer-inner {
         flex-direction: column;
+
         text-align: center;
       }
+
     }
 
   </style>
 </head>
 
+
 <body>
+
 
   <!-- HEADER -->
 
   <header class="site-header">
+
     <div class="container header-inner">
 
       <div class="brand">
 
         <img
-  class="brand-logo"
-  src="/logo.png"
-  alt="Riftbound.gr"
->
+          class="brand-logo"
+          src="/logo.png"
+          alt="Riftbound.gr"
+        >
 
         <div class="brand-divider"></div>
 
@@ -1071,6 +1127,7 @@ cursor: pointer;
         </div>
 
       </div>
+
 
       <a
         class="back-link"
@@ -1081,10 +1138,13 @@ cursor: pointer;
       </a>
 
     </div>
+
   </header>
 
 
+
   <main>
+
 
     <!-- HERO -->
 
@@ -1094,12 +1154,17 @@ cursor: pointer;
 
         <div class="hero-panel">
 
+
           <div class="hero-copy">
 
             <div class="eyebrow">
+
               <span class="eyebrow-dot"></span>
+
               Riftbound Events Greece
+
             </div>
+
 
             <h1>
               Βρες το επόμενο
@@ -1107,14 +1172,19 @@ cursor: pointer;
               στην Ελλάδα.
             </h1>
 
+
             <p class="hero-description">
               Όλα τα επερχόμενα Riftbound events της ελληνικής
               κοινότητας, συγκεντρωμένα σε ένα σημείο.
             </p>
 
+
             <div class="sync-note">
+
               <span class="sync-light"></span>
+
               Αυτόματη ενημέρωση κάθε ώρα
+
             </div>
 
           </div>
@@ -1123,28 +1193,17 @@ cursor: pointer;
           <div class="hero-rifty">
 
             <div class="magic-orb"></div>
+
             <div class="magic-ring"></div>
 
-            <!--
-              Προσωρινό Rifty.
-              Στο επόμενο βήμα θα βάλουμε την πραγματική εικόνα.
-            -->
-
             <img
-  class="rifty-placeholder"
-  src="/rifty.jpg"
-  alt="Rifty"
-  style="
-    width: 320px;
-    height: 320px;
-    object-fit: cover;
-    object-position: center 14%;
-    background: none;
-    margin-bottom: -42px;
-  "
->
+              class="rifty-placeholder"
+              src="/rifty.jpg"
+              alt="Rifty"
+            >
 
           </div>
+
 
         </div>
 
@@ -1153,7 +1212,9 @@ cursor: pointer;
 
         <div class="stats">
 
+
           <div class="stat-card">
+
             <strong
               class="stat-number"
               id="events-count"
@@ -1164,10 +1225,12 @@ cursor: pointer;
             <span class="stat-label">
               Events
             </span>
+
           </div>
 
 
           <div class="stat-card">
+
             <strong
               class="stat-number"
               id="stores-count"
@@ -1178,10 +1241,12 @@ cursor: pointer;
             <span class="stat-label">
               Καταστήματα
             </span>
+
           </div>
 
 
           <div class="stat-card">
+
             <strong
               class="stat-number"
               id="cities-count"
@@ -1192,7 +1257,9 @@ cursor: pointer;
             <span class="stat-label">
               Πόλεις
             </span>
+
           </div>
+
 
         </div>
 
@@ -1201,15 +1268,18 @@ cursor: pointer;
     </section>
 
 
+
     <!-- EVENTS -->
 
     <section class="events-section">
 
       <div class="container">
 
+
         <div class="events-heading">
 
           <div>
+
             <h2>
               Επερχόμενα Events
             </h2>
@@ -1217,13 +1287,14 @@ cursor: pointer;
             <p>
               Βρες πού και πότε παίζει η ελληνική κοινότητα.
             </p>
+
           </div>
+
 
           <div
             class="result-count"
             id="result-count"
-          >
-          </div>
+          ></div>
 
         </div>
 
@@ -1231,6 +1302,7 @@ cursor: pointer;
         <!-- FILTERS -->
 
         <div class="toolbar">
+
 
           <div class="field">
 
@@ -1272,10 +1344,11 @@ cursor: pointer;
 
           </div>
 
+
         </div>
 
 
-        <!-- EVENT LIST -->
+        <!-- EVENTS LIST -->
 
         <div id="events">
 
@@ -1298,11 +1371,14 @@ cursor: pointer;
           Εμφάνιση περισσότερων
         </button>
 
+
       </div>
 
     </section>
 
+
   </main>
+
 
 
   <!-- FOOTER -->
@@ -1312,11 +1388,15 @@ cursor: pointer;
     <div class="container footer-inner">
 
       <div>
+
         <span class="footer-brand">
           Riftbound.gr
         </span>
+
         · Events Greece
+
       </div>
+
 
       <div>
         Τα events ενημερώνονται αυτόματα
@@ -1328,25 +1408,30 @@ cursor: pointer;
   </footer>
 
 
+
   <script>
 
     const API_URL =
       "https://riftbound-events.philippos-mich.workers.dev/api/events";
 
+
     const TIME_ZONE =
       "Europe/Athens";
 
+
     const INITIAL_LIMIT = 36;
     const LOAD_MORE_STEP = 36;
+
 
     let allEvents = [];
     let filteredEvents = [];
     let visibleLimit = INITIAL_LIMIT;
 
 
-    // ------------------------------------------
-    // Helpers
-    // ------------------------------------------
+
+    /* ---------------------------------
+       BASIC HELPERS
+    --------------------------------- */
 
     function escapeHTML(value) {
 
@@ -1360,16 +1445,19 @@ cursor: pointer;
     }
 
 
+
     function safeURL(value) {
 
       if (!value) {
         return null;
       }
 
+
       try {
 
         const url =
           new URL(value);
+
 
         if (
           url.protocol === "https:" ||
@@ -1380,21 +1468,280 @@ cursor: pointer;
 
       } catch (_) {}
 
+
       return null;
 
     }
 
 
+
+    function normalize(value) {
+
+      return String(value || "")
+        .toLocaleLowerCase("el-GR")
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        );
+
+    }
+
+
+
+    /* ---------------------------------
+       CITY NORMALIZATION
+    --------------------------------- */
+
+    function canonicalCityName(city) {
+
+      const value =
+        String(city || "").trim();
+
+
+      if (!value) {
+        return "";
+      }
+
+
+      const key =
+        value
+          .toLocaleLowerCase("el-GR")
+          .normalize("NFD")
+          .replace(
+            /[\u0300-\u036f]/g,
+            ""
+          );
+
+
+      const cityMap = {
+
+        "athens": "Αθήνα",
+        "athina": "Αθήνα",
+        "αθηνα": "Αθήνα",
+
+        "thessaloniki": "Θεσσαλονίκη",
+        "θεσσαλονικη": "Θεσσαλονίκη",
+
+        "iraklio": "Ηράκλειο",
+        "heraklion": "Ηράκλειο",
+        "ηρακλειο": "Ηράκλειο",
+
+        "chania": "Χανιά",
+        "χανια": "Χανιά",
+
+        "corfu": "Κέρκυρα",
+        "kerkyra": "Κέρκυρα",
+        "κερκυρα": "Κέρκυρα",
+
+        "kifisia": "Κηφισιά",
+        "κηφισια": "Κηφισιά",
+
+        "larisa": "Λάρισα",
+        "larissa": "Λάρισα",
+        "λαρισα": "Λάρισα",
+
+        "skydra": "Σκύδρα",
+        "σκυδρα": "Σκύδρα",
+
+        "ag. dimitrios": "Άγιος Δημήτριος",
+        "agios dimitrios": "Άγιος Δημήτριος",
+        "αγιος δημητριος": "Άγιος Δημήτριος",
+
+        "chalandri": "Χαλάνδρι",
+        "halandri": "Χαλάνδρι",
+        "χαλανδρι": "Χαλάνδρι",
+
+        "egaleo": "Αιγάλεω",
+        "aigaleo": "Αιγάλεω",
+        "αιγαλεω": "Αιγάλεω",
+
+        "galatsi": "Γαλάτσι",
+        "γαλατσι": "Γαλάτσι",
+
+        "kalamaria": "Καλαμαριά",
+        "καλαμαρια": "Καλαμαριά",
+
+        "kalamata": "Καλαμάτα",
+        "καλαματα": "Καλαμάτα",
+
+        "kallithea": "Καλλιθέα",
+        "καλλιθεα": "Καλλιθέα",
+
+        "koridallos": "Κορυδαλλός",
+        "korydallos": "Κορυδαλλός",
+        "κορυδαλλος": "Κορυδαλλός",
+
+        "lamia": "Λαμία",
+        "λαμια": "Λαμία",
+
+        "marousi": "Μαρούσι",
+        "amarousio": "Μαρούσι",
+        "μαρουσι": "Μαρούσι",
+
+        "nea erithrea": "Νέα Ερυθραία",
+        "nea erythraia": "Νέα Ερυθραία",
+        "νεα ερυθραια": "Νέα Ερυθραία",
+
+        "neo irakleio": "Νέο Ηράκλειο",
+        "neo iraklio": "Νέο Ηράκλειο",
+        "νεο ηρακλειο": "Νέο Ηράκλειο",
+
+        "patra": "Πάτρα",
+        "patras": "Πάτρα",
+        "πατρα": "Πάτρα",
+
+        "peristeri": "Περιστέρι",
+        "περιστερι": "Περιστέρι",
+
+        "pireas": "Πειραιάς",
+        "piraeus": "Πειραιάς",
+        "πειραιας": "Πειραιάς",
+
+        "serres": "Σέρρες",
+        "serrai": "Σέρρες",
+        "σερρες": "Σέρρες",
+
+        "thermi": "Θέρμη",
+        "θερμη": "Θέρμη",
+
+        "volos": "Βόλος",
+        "βολος": "Βόλος"
+
+      };
+
+
+      return cityMap[key] || value;
+
+    }
+
+
+
+    function getEventCity(event) {
+
+      if (event.city) {
+
+        return canonicalCityName(
+          event.city
+        );
+
+      }
+
+
+      const address =
+        String(
+          event.address || ""
+        ).trim();
+
+
+      if (!address) {
+        return "";
+      }
+
+
+      const parts =
+        address
+          .split(",")
+          .map(
+            part => part.trim()
+          )
+          .filter(Boolean);
+
+
+      const countries = [
+        "greece",
+        "gr",
+        "grc",
+        "hellas",
+        "ελλαδα"
+      ];
+
+
+      for (
+        let i = parts.length - 1;
+        i >= 0;
+        i--
+      ) {
+
+        let part =
+          parts[i].trim();
+
+
+        const lower =
+          part
+            .toLocaleLowerCase("el-GR")
+            .normalize("NFD")
+            .replace(
+              /[\u0300-\u036f]/g,
+              ""
+            );
+
+
+        if (
+          countries.includes(lower)
+        ) {
+          continue;
+        }
+
+
+        if (
+          /^\d{5}$/.test(part) ||
+          /^\d{3}\s?\d{2}$/.test(part)
+        ) {
+          continue;
+        }
+
+
+        part =
+          part
+            .replace(
+              /\b\d{3}\s?\d{2}\b/g,
+              ""
+            )
+            .replace(
+              /\b\d{5}\b/g,
+              ""
+            )
+            .trim();
+
+
+        if (part) {
+
+          return canonicalCityName(
+            part
+          );
+
+        }
+
+      }
+
+
+      return "";
+
+    }
+
+
+
+    /* ---------------------------------
+       DATE HELPERS
+    --------------------------------- */
+
     function eventDate(event) {
 
       const date =
-        new Date(event.start_time);
+        new Date(
+          event.start_time
+        );
 
-      return Number.isNaN(date.getTime())
+
+      return Number.isNaN(
+        date.getTime()
+      )
         ? null
         : date;
 
     }
+
 
 
     function athensDateKey(date) {
@@ -1408,14 +1755,22 @@ cursor: pointer;
             month: "2-digit",
             day: "2-digit"
           }
-        ).formatToParts(date);
+        )
+        .formatToParts(date);
+
 
       const values = {};
 
-      parts.forEach(part => {
-        values[part.type] =
-          part.value;
-      });
+
+      parts.forEach(
+        part => {
+
+          values[part.type] =
+            part.value;
+
+        }
+      );
+
 
       return (
         values.year +
@@ -1428,6 +1783,7 @@ cursor: pointer;
     }
 
 
+
     function dateParts(date) {
 
       const day =
@@ -1437,7 +1793,9 @@ cursor: pointer;
             timeZone: TIME_ZONE,
             day: "2-digit"
           }
-        ).format(date);
+        )
+        .format(date);
+
 
       const month =
         new Intl.DateTimeFormat(
@@ -1450,12 +1808,14 @@ cursor: pointer;
         .format(date)
         .replace(".", "");
 
+
       return {
         day,
         month
       };
 
     }
+
 
 
     function formatTime(date) {
@@ -1467,9 +1827,11 @@ cursor: pointer;
           hour: "2-digit",
           minute: "2-digit"
         }
-      ).format(date);
+      )
+      .format(date);
 
     }
+
 
 
     function formatFullDate(date) {
@@ -1482,20 +1844,25 @@ cursor: pointer;
           day: "numeric",
           month: "long"
         }
-      ).format(date);
+      )
+      .format(date);
 
     }
 
 
+
+    /* ---------------------------------
+       EVENT TYPE
+    --------------------------------- */
+
     function smartEventType(event) {
 
       const text =
-        String(event.title || "")
-          .toLowerCase();
+        String(
+          event.title || ""
+        )
+        .toLowerCase();
 
-      if (text.includes("nexus")) {
-        return "Nexus Night";
-      }
 
       if (
         text.includes("summoner") &&
@@ -1504,6 +1871,14 @@ cursor: pointer;
         return "Summoner Skirmish";
       }
 
+
+      if (
+        text.includes("nexus")
+      ) {
+        return "Nexus Night";
+      }
+
+
       if (
         text.includes("pre-rift") ||
         text.includes("prerift")
@@ -1511,158 +1886,59 @@ cursor: pointer;
         return "Pre-Rift";
       }
 
-      if (text.includes("showdown")) {
+
+      if (
+        text.includes("showdown")
+      ) {
         return "Showdown";
       }
 
-      if (text.includes("regional")) {
+
+      if (
+        text.includes("regional")
+      ) {
         return "Regional";
       }
 
-      if (text.includes("challenge")) {
+
+      if (
+        text.includes("challenge")
+      ) {
         return "Challenge";
       }
 
-      if (text.includes("cup")) {
+
+      if (
+        text.includes("cup")
+      ) {
         return "Cup";
       }
 
+
       const fallback =
-        String(event.event_type || "");
+        String(
+          event.event_type || ""
+        );
+
 
       if (
         fallback &&
-        fallback.toLowerCase() !== "locals"
+        fallback.toLowerCase() !==
+          "locals"
       ) {
         return fallback;
       }
+
 
       return "Local Event";
 
     }
 
-function canonicalCityName(city) {
-
-  const value =
-    String(city || "").trim();
-
-  const key =
-    normalize(value);
-
-  const cityMap = {
-    "athens": "Αθήνα",
-    "athina": "Αθήνα",
-    "αθηνα": "Αθήνα",
-
-    "iraklio": "Ηράκλειο",
-    "ηρακλειο": "Ηράκλειο",
-
-    "thessaloniki": "Θεσσαλονίκη",
-    "θεσσαλονικη": "Θεσσαλονίκη",
-
-    "chania": "Χανιά",
-    "corfu": "Κέρκυρα",
-    "chalandri": "Χαλάνδρι",
-    "ag. dimitrios": "Άγιος Δημήτριος",
-    "egaleo": "Αιγάλεω",
-    "galatsi": "Γαλάτσι",
-    "kalamaria": "Καλαμαριά",
-    "kalamata": "Καλαμάτα",
-    "kallithea": "Καλλιθέα",
-    "koridallos": "Κορυδαλλός",
-    "lamia": "Λαμία",
-    "marousi": "Μαρούσι",
-    "nea erithrea": "Νέα Ερυθραία",
-    "neo irakleio": "Νέο Ηράκλειο",
-    "patra": "Πάτρα",
-    "peristeri": "Περιστέρι",
-    "pireas": "Πειραιάς",
-    "serres": "Σέρρες",
-    "thermi": "Θέρμη",
-    "volos": "Βόλος"
-  };
-
-  return cityMap[key] || value;
-}
-    
-    function getEventCity(event) {
-
-  if (event.city) {
-    return canonicalCityName(event.city);
-  }
-
-  const address =
-    String(event.address || "").trim();
-
-  if (!address) {
-    return "";
-  }
-
-  const parts =
-    address
-      .split(",")
-      .map(part => part.trim())
-      .filter(Boolean);
-
-  const countries =
-    [
-      "greece",
-      "gr",
-      "grc",
-      "hellas",
-      "ελλάδα"
-    ];
-
-  for (
-    let i = parts.length - 1;
-    i >= 0;
-    i--
-  ) {
-
-    let part =
-      parts[i].trim();
-
-    const lower =
-      part.toLocaleLowerCase("el-GR");
-
-    if (
-      countries.includes(lower)
-    ) {
-      continue;
-    }
-
-    if (
-      /^\d{5}$/.test(part) ||
-      /^\d{3}\s?\d{2}$/.test(part)
-    ) {
-      continue;
-    }
-
-    part =
-      part
-        .replace(
-          /\b\d{3}\s?\d{2}\b/g,
-          ""
-        )
-        .replace(
-          /\b\d{5}\b/g,
-          ""
-        )
-        .trim();
-
-    if (part) {
-      return canonicalCityName(part);
-    }
-
-  }
-
-  return "";
-}
 
 
-    // ------------------------------------------
-    // Populate stats & filters
-    // ------------------------------------------
+    /* ---------------------------------
+       STATS & FILTER OPTIONS
+    --------------------------------- */
 
     function populatePageData(events) {
 
@@ -1670,37 +1946,51 @@ function canonicalCityName(city) {
         [
           ...new Set(
             events
-              .map(event => event.store_name)
+              .map(
+                event =>
+                  event.store_name
+              )
               .filter(Boolean)
           )
         ];
+
 
       const cities =
         [
           ...new Set(
             events
-              .map(event => getEventCity(event))
+              .map(
+                event =>
+                  getEventCity(event)
+              )
               .filter(Boolean)
           )
         ];
 
 
       document
-        .getElementById("events-count")
+        .getElementById(
+          "events-count"
+        )
         .textContent =
           events.length;
 
 
       document
-        .getElementById("stores-count")
+        .getElementById(
+          "stores-count"
+        )
         .textContent =
           stores.length;
 
 
       document
-        .getElementById("cities-count")
+        .getElementById(
+          "cities-count"
+        )
         .textContent =
           cities.length;
+
 
 
       const cityFilter =
@@ -1717,24 +2007,30 @@ function canonicalCityName(city) {
               "el"
             )
         )
-        .forEach(city => {
+        .forEach(
+          city => {
 
-          const option =
-            document.createElement(
-              "option"
+            const option =
+              document.createElement(
+                "option"
+              );
+
+
+            option.value =
+              city;
+
+
+            option.textContent =
+              city;
+
+
+            cityFilter.appendChild(
+              option
             );
 
-          option.value =
-            city;
+          }
+        );
 
-          option.textContent =
-            city;
-
-          cityFilter.appendChild(
-            option
-          );
-
-        });
 
 
       const storeFilter =
@@ -1751,38 +2047,46 @@ function canonicalCityName(city) {
               "el"
             )
         )
-        .forEach(store => {
+        .forEach(
+          store => {
 
-          const option =
-            document.createElement(
-              "option"
+            const option =
+              document.createElement(
+                "option"
+              );
+
+
+            option.value =
+              store;
+
+
+            option.textContent =
+              store;
+
+
+            storeFilter.appendChild(
+              option
             );
 
-          option.value =
-            store;
-
-          option.textContent =
-            store;
-
-          storeFilter.appendChild(
-            option
-          );
-
-        });
+          }
+        );
 
     }
 
 
-    // ------------------------------------------
-    // Filters
-    // ------------------------------------------
+
+    /* ---------------------------------
+       FILTERING
+    --------------------------------- */
 
     function applyFilters() {
 
       const search =
         normalize(
           document
-            .getElementById("search")
+            .getElementById(
+              "search"
+            )
             .value
         );
 
@@ -1803,45 +2107,54 @@ function canonicalCityName(city) {
           .value;
 
 
+
       filteredEvents =
-        allEvents.filter(event => {
+        allEvents.filter(
+          event => {
 
-          const searchable =
-            normalize(
-              [
-                event.title,
-                event.store_name,
-                getEventCity(event),
-                event.address,
-                smartEventType(event)
-              ].join(" ")
+            const eventCity =
+              getEventCity(event);
+
+
+            const searchable =
+              normalize(
+                [
+                  event.title,
+                  event.store_name,
+                  eventCity,
+                  event.address,
+                  smartEventType(event)
+                ]
+                .join(" ")
+              );
+
+
+            const matchesSearch =
+              !search ||
+              searchable.includes(
+                search
+              );
+
+
+            const matchesCity =
+              !city ||
+              eventCity === city;
+
+
+            const matchesStore =
+              !store ||
+              event.store_name ===
+                store;
+
+
+            return (
+              matchesSearch &&
+              matchesCity &&
+              matchesStore
             );
 
-
-          const matchesSearch =
-            !search ||
-            searchable.includes(
-              search
-            );
-
-
-          const matchesCity =
-  !city ||
-  getEventCity(event) === city;
-
-
-          const matchesStore =
-            !store ||
-            event.store_name === store;
-
-
-          return (
-            matchesSearch &&
-            matchesCity &&
-            matchesStore
-          );
-
-        });
+          }
+        );
 
 
       visibleLimit =
@@ -1853,9 +2166,10 @@ function canonicalCityName(city) {
     }
 
 
-    // ------------------------------------------
-    // Group label
-    // ------------------------------------------
+
+    /* ---------------------------------
+       DATE GROUP LABEL
+    --------------------------------- */
 
     function groupLabel(date) {
 
@@ -1864,7 +2178,9 @@ function canonicalCityName(city) {
 
 
       const today =
-        athensDateKey(now);
+        athensDateKey(
+          now
+        );
 
 
       const tomorrowDate =
@@ -1881,15 +2197,21 @@ function canonicalCityName(city) {
 
 
       const eventKey =
-        athensDateKey(date);
+        athensDateKey(
+          date
+        );
 
 
-      if (eventKey === today) {
+      if (
+        eventKey === today
+      ) {
         return "Σήμερα";
       }
 
 
-      if (eventKey === tomorrow) {
+      if (
+        eventKey === tomorrow
+      ) {
         return "Αύριο";
       }
 
@@ -1901,145 +2223,175 @@ function canonicalCityName(city) {
     }
 
 
-    // ------------------------------------------
-    // Event card
-    // ------------------------------------------
+
+    /* ---------------------------------
+       CREATE EVENT CARD
+    --------------------------------- */
 
     function createEventCard(event) {
 
-  const date =
-    eventDate(event);
+      const date =
+        eventDate(event);
 
 
-  if (!date) {
-    return "";
-  }
+      if (!date) {
+        return "";
+      }
 
 
-  const parts =
-    dateParts(date);
+      const parts =
+        dateParts(date);
 
 
-  const location =
-  getEventCity(event) ||
-  event.address ||
-  "Ελλάδα";
+      const city =
+        getEventCity(event);
 
 
-  const store =
-    event.store_name ||
-    "Riftbound Event";
+      const location =
+        city ||
+        event.address ||
+        "Ελλάδα";
 
 
-  const url =
-    safeURL(
-      event.event_url
-    );
+      const store =
+        event.store_name ||
+        "Riftbound Event";
 
 
-  const tagName =
-    url ? "a" : "article";
+      const url =
+        safeURL(
+          event.event_url
+        );
 
 
-  const linkAttributes =
-    url
-      ? `
-          href="${escapeHTML(url)}"
-          target="_blank"
-          rel="noopener noreferrer"
-        `
-      : "";
+      const tagName =
+        url
+          ? "a"
+          : "article";
 
 
-  return `
-    <${tagName}
-      class="event-card"
-      ${linkAttributes}
-    >
-
-      <div class="event-date-box">
-
-        <div class="event-day">
-          ${escapeHTML(parts.day)}
-        </div>
-
-        <div class="event-month">
-          ${escapeHTML(parts.month)}
-        </div>
-
-      </div>
-
-
-      <div class="event-content">
-
-        <div class="event-type">
-          ${escapeHTML(
-            smartEventType(event)
-          )}
-        </div>
-
-        <h4 class="event-title">
-          ${escapeHTML(
-            event.title ||
-            "Riftbound Event"
-          )}
-        </h4>
-
-
-        <div class="event-meta">
-
-          <span class="meta-item">
-            <span class="meta-icon">
-              ◷
-            </span>
-
-            ${escapeHTML(
-              formatTime(date)
-            )}
-          </span>
-
-
-          <span class="meta-item">
-            <span class="meta-icon">
-              ◆
-            </span>
-
-            ${escapeHTML(store)}
-          </span>
-
-
-          <span class="meta-item">
-            <span class="meta-icon">
-              ◎
-            </span>
-
-            ${escapeHTML(location)}
-          </span>
-
-        </div>
-
-
-        ${
-          url
-            ? `
-              <span class="event-link">
-                Δες το event →
-              </span>
+      const linkAttributes =
+        url
+          ? `
+              href="${escapeHTML(url)}"
+              target="_blank"
+              rel="noopener noreferrer"
             `
-            : ""
-        }
-
-      </div>
-
-    </${tagName}>
-  `;
-
-}
+          : "";
 
 
-    // ------------------------------------------
-    // Render
-    // ------------------------------------------
+      return `
+        <${tagName}
+          class="event-card"
+          ${linkAttributes}
+        >
+
+          <div class="event-date-box">
+
+            <div class="event-day">
+              ${escapeHTML(
+                parts.day
+              )}
+            </div>
+
+            <div class="event-month">
+              ${escapeHTML(
+                parts.month
+              )}
+            </div>
+
+          </div>
+
+
+          <div class="event-content">
+
+            <div class="event-type">
+
+              ${escapeHTML(
+                smartEventType(event)
+              )}
+
+            </div>
+
+
+            <h4 class="event-title">
+
+              ${escapeHTML(
+                event.title ||
+                "Riftbound Event"
+              )}
+
+            </h4>
+
+
+            <div class="event-meta">
+
+
+              <span class="meta-item">
+
+                <span class="meta-icon">
+                  ◷
+                </span>
+
+                ${escapeHTML(
+                  formatTime(date)
+                )}
+
+              </span>
+
+
+              <span class="meta-item">
+
+                <span class="meta-icon">
+                  ◆
+                </span>
+
+                ${escapeHTML(
+                  store
+                )}
+
+              </span>
+
+
+              <span class="meta-item">
+
+                <span class="meta-icon">
+                  ◎
+                </span>
+
+                ${escapeHTML(
+                  location
+                )}
+
+              </span>
+
+
+            </div>
+
+
+            ${
+              url
+                ? `
+                  <span class="event-link">
+                    Δες το event →
+                  </span>
+                `
+                : ""
+            }
+
+
+          </div>
+
+        </${tagName}>
+      `;
+
+    }
+
+
+
+    /* ---------------------------------
+       RENDER EVENTS
+    --------------------------------- */
 
     function renderEvents() {
 
@@ -2065,6 +2417,7 @@ function canonicalCityName(city) {
         `${filteredEvents.length} events`;
 
 
+
       if (
         filteredEvents.length === 0
       ) {
@@ -2077,12 +2430,15 @@ function canonicalCityName(city) {
             </div>
           `;
 
+
         loadMore.style.display =
           "none";
+
 
         return;
 
       }
+
 
 
       const visibleEvents =
@@ -2096,85 +2452,98 @@ function canonicalCityName(city) {
         new Map();
 
 
-      visibleEvents.forEach(event => {
 
-        const date =
-          eventDate(event);
+      visibleEvents.forEach(
+        event => {
+
+          const date =
+            eventDate(event);
 
 
-        if (!date) {
-          return;
+          if (!date) {
+            return;
+          }
+
+
+          const key =
+            athensDateKey(
+              date
+            );
+
+
+          if (
+            !groups.has(key)
+          ) {
+
+            groups.set(
+              key,
+              {
+                date,
+                events: []
+              }
+            );
+
+          }
+
+
+          groups
+            .get(key)
+            .events
+            .push(event);
+
         }
+      );
 
-
-        const key =
-          athensDateKey(date);
-
-
-        if (!groups.has(key)) {
-
-          groups.set(
-            key,
-            {
-              date,
-              events: []
-            }
-          );
-
-        }
-
-
-        groups
-          .get(key)
-          .events
-          .push(event);
-
-      });
 
 
       let html = "";
 
 
-      groups.forEach(group => {
 
-        html += `
-          <section class="date-group">
+      groups.forEach(
+        group => {
 
-            <div class="date-heading">
+          html += `
+            <section class="date-group">
 
-              <h3>
-                ${escapeHTML(
-                  groupLabel(
-                    group.date
-                  )
-                )}
-              </h3>
+              <div class="date-heading">
 
-              <div class="date-line"></div>
+                <h3>
+                  ${escapeHTML(
+                    groupLabel(
+                      group.date
+                    )
+                  )}
+                </h3>
 
-            </div>
+                <div class="date-line"></div>
+
+              </div>
 
 
-            <div class="event-grid">
+              <div class="event-grid">
 
-              ${
-                group.events
-                  .map(
-                    createEventCard
-                  )
-                  .join("")
-              }
+                ${
+                  group.events
+                    .map(
+                      createEventCard
+                    )
+                    .join("")
+                }
 
-            </div>
+              </div>
 
-          </section>
-        `;
+            </section>
+          `;
 
-      });
+        }
+      );
+
 
 
       container.innerHTML =
         html;
+
 
 
       if (
@@ -2195,9 +2564,10 @@ function canonicalCityName(city) {
     }
 
 
-    // ------------------------------------------
-    // Load events
-    // ------------------------------------------
+
+    /* ---------------------------------
+       LOAD EVENTS
+    --------------------------------- */
 
     async function loadEvents() {
 
@@ -2215,7 +2585,9 @@ function canonicalCityName(city) {
           );
 
 
-        if (!response.ok) {
+        if (
+          !response.ok
+        ) {
 
           throw new Error(
             `HTTP ${response.status}`
@@ -2239,6 +2611,7 @@ function canonicalCityName(city) {
 
             const aDate =
               eventDate(a);
+
 
             const bDate =
               eventDate(b);
@@ -2287,8 +2660,7 @@ function canonicalCityName(city) {
             <div class="status-card">
 
               <strong>
-                Δεν ήταν δυνατή η φόρτωση
-                των events.
+                Δεν ήταν δυνατή η φόρτωση των events.
               </strong>
 
               <br><br>
@@ -2303,12 +2675,15 @@ function canonicalCityName(city) {
     }
 
 
-    // ------------------------------------------
-    // Events
-    // ------------------------------------------
+
+    /* ---------------------------------
+       EVENT LISTENERS
+    --------------------------------- */
 
     document
-      .getElementById("search")
+      .getElementById(
+        "search"
+      )
       .addEventListener(
         "input",
         applyFilters
@@ -2346,6 +2721,7 @@ function canonicalCityName(city) {
           visibleLimit +=
             LOAD_MORE_STEP;
 
+
           renderEvents();
 
         }
@@ -2355,6 +2731,7 @@ function canonicalCityName(city) {
     loadEvents();
 
   </script>
+
 
 </body>
 </html>
