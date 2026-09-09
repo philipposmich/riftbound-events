@@ -217,6 +217,7 @@ async function syncGreekEvents(
             updated_at = CURRENT_TIMESTAMP
         `).bind(
           externalId,
+
           event.name ||
             "Riftbound Event",
 
@@ -307,8 +308,9 @@ export default {
       new URL(request.url);
 
 
+
     /*
-      Manual sync test
+      MANUAL SYNC TEST
     */
 
     if (
@@ -344,9 +346,6 @@ export default {
 
     /*
       UPCOMING EVENTS
-
-      Αυτό συνεχίζει να τροφοδοτεί
-      τη σημερινή λίστα.
     */
 
     if (
@@ -392,18 +391,7 @@ export default {
 
 
     /*
-      CALENDAR ARCHIVE
-
-      Επιστρέφει:
-
-      - όλα τα active events
-      - όλα τα events που έχουν
-        ημερομηνία στο παρελθόν
-
-      Δεν επιστρέφει inactive
-      events του μέλλοντος, γιατί
-      αυτά μπορεί να έχουν
-      ακυρωθεί ή αφαιρεθεί.
+      CALENDAR + ARCHIVE
     */
 
     if (
@@ -449,6 +437,67 @@ export default {
 
             "Cache-Control":
               "public, max-age=300"
+          }
+        }
+      );
+    }
+
+
+
+    /*
+      SYNC STATUS
+
+      Το MAX(last_seen_at) αντιστοιχεί
+      στην τελευταία φορά που τα events
+      ενημερώθηκαν επιτυχώς από το sync.
+    */
+
+    if (
+      url.pathname ===
+      "/api/status"
+    ) {
+      const status =
+        await env.DB.prepare(`
+          SELECT
+            MAX(last_seen_at)
+              AS last_successful_sync,
+
+            COUNT(
+              CASE
+                WHEN status = 'active'
+                THEN 1
+              END
+            )
+              AS active_events
+
+          FROM events
+
+          WHERE
+            source = 'legacy-locator'
+        `)
+        .first();
+
+
+      return Response.json(
+        {
+          online: true,
+
+          last_successful_sync:
+            status?.last_successful_sync ||
+            null,
+
+          active_events:
+            Number(
+              status?.active_events || 0
+            )
+        },
+        {
+          headers: {
+            "Access-Control-Allow-Origin":
+              "*",
+
+            "Cache-Control":
+              "no-store"
           }
         }
       );
