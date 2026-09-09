@@ -11,6 +11,8 @@
     content="Βρες τα επόμενα Riftbound events και τουρνουά στην Ελλάδα."
   >
 
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
@@ -32,7 +34,9 @@
       --purple-light: #f2e9fa;
 
       --gold: #dba92e;
-      --shadow: 0 18px 45px rgba(41, 28, 52, 0.07);
+
+      --shadow:
+        0 18px 45px rgba(41, 28, 52, 0.07);
 
       --container: 1180px;
     }
@@ -68,7 +72,10 @@
     }
 
     .container {
-      width: min(calc(100% - 40px), var(--container));
+      width: min(
+        calc(100% - 40px),
+        var(--container)
+      );
       margin: 0 auto;
     }
 
@@ -220,7 +227,6 @@
       gap: 9px;
 
       width: fit-content;
-
       margin-bottom: 18px;
 
       color: var(--purple);
@@ -437,7 +443,7 @@
     }
 
 
-    /* EVENTS HEADER */
+    /* EVENTS */
 
     .events-section {
       padding: 35px 0 80px;
@@ -676,10 +682,6 @@
       border-color: #e4e4e6;
     }
 
-    .event-card.is-past:hover {
-      border-color: #d5d2d8;
-    }
-
     .event-date-box {
       width: 78px;
       height: 88px;
@@ -787,7 +789,7 @@
     }
 
 
-    /* EVENT TYPES */
+    /* TYPES */
 
     .event-type {
       display: inline-flex;
@@ -1534,6 +1536,7 @@
 <body>
 
 <header class="site-header">
+
   <div class="container header-inner">
 
     <div class="brand">
@@ -1561,6 +1564,7 @@
     </a>
 
   </div>
+
 </header>
 
 
@@ -1591,9 +1595,15 @@
           κοινότητας, συγκεντρωμένα σε ένα σημείο.
         </p>
 
-        <div class="sync-note">
+        <div
+          class="sync-note"
+          id="sync-note"
+        >
           <span class="sync-light"></span>
-          Αυτόματη ενημέρωση κάθε ώρα
+
+          <span id="sync-status-text">
+            Τελευταία ενημέρωση: —
+          </span>
         </div>
 
       </div>
@@ -1955,14 +1965,14 @@
 const UPCOMING_API_URL =
   "https://riftbound-events.philippos-mich.workers.dev/api/events";
 
-
 const CALENDAR_API_URL =
   "https://riftbound-events.philippos-mich.workers.dev/api/calendar-events";
 
+const STATUS_API_URL =
+  "https://riftbound-events.philippos-mich.workers.dev/api/status";
 
 const TIME_ZONE =
   "Europe/Athens";
-
 
 const INITIAL_LIMIT = 36;
 const LOAD_MORE_STEP = 36;
@@ -2036,6 +2046,132 @@ function normalize(value) {
       /[\u0300-\u036f]/g,
       ""
     );
+}
+
+
+
+/* SYNC STATUS */
+
+function parseDatabaseUTC(value) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized =
+    value.includes("T")
+      ? value
+      : value.replace(" ", "T");
+
+  const utcValue =
+    /Z$|[+-]\d\d:\d\d$/.test(normalized)
+      ? normalized
+      : `${normalized}Z`;
+
+  const date =
+    new Date(utcValue);
+
+  return Number.isNaN(
+    date.getTime()
+  )
+    ? null
+    : date;
+}
+
+
+
+function formatSyncTime(date) {
+  return new Intl.DateTimeFormat(
+    "el-GR",
+    {
+      timeZone: TIME_ZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      hourCycle: "h23"
+    }
+  )
+  .format(date);
+}
+
+
+
+function formatSyncFullDate(date) {
+  return new Intl.DateTimeFormat(
+    "el-GR",
+    {
+      timeZone: TIME_ZONE,
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      hourCycle: "h23"
+    }
+  )
+  .format(date);
+}
+
+
+
+async function loadSyncStatus() {
+  const text =
+    document.getElementById(
+      "sync-status-text"
+    );
+
+  const note =
+    document.getElementById(
+      "sync-note"
+    );
+
+  try {
+    const response =
+      await fetch(
+        STATUS_API_URL,
+        {
+          cache: "no-store"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `Status API HTTP ${response.status}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    const syncDate =
+      parseDatabaseUTC(
+        data.last_successful_sync
+      );
+
+    if (!syncDate) {
+      text.textContent =
+        "Τελευταία ενημέρωση: —";
+
+      return;
+    }
+
+    text.textContent =
+      `Τελευταία ενημέρωση: ${formatSyncTime(syncDate)}`;
+
+    note.title =
+      `Τελευταίο επιτυχημένο sync: ${formatSyncFullDate(syncDate)}`;
+  }
+
+  catch (error) {
+    console.error(
+      "Sync status error:",
+      error
+    );
+
+    text.textContent =
+      "Τελευταία ενημέρωση: —";
+  }
 }
 
 
@@ -3573,7 +3709,7 @@ function renderCurrentView() {
 
 
 
-/* LOAD */
+/* LOAD EVENTS */
 
 async function loadEvents() {
   const container =
@@ -3934,6 +4070,7 @@ document
 
 
 loadEvents();
+loadSyncStatus();
 
 </script>
 
