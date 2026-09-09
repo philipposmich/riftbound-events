@@ -1541,6 +1541,36 @@ cursor: pointer;
 
     }
 
+    function getEventCity(event) {
+
+  if (event.city) {
+    return event.city;
+  }
+
+  const address =
+    String(event.address || "").trim();
+
+  if (!address) {
+    return "";
+  }
+
+  const parts =
+    address
+      .split(",")
+      .map(part => part.trim())
+      .filter(Boolean);
+
+  if (parts.length >= 2) {
+
+    return parts[1]
+      .replace(/\b\d{3}\s?\d{2}\b/g, "")
+      .replace(/\b\d{5}\b/g, "")
+      .trim();
+
+  }
+
+  return "";
+}
 
     function normalize(value) {
 
