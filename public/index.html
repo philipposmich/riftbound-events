@@ -663,6 +663,10 @@
     ------------------------------ */
 
     .event-card {
+      text-decoration: none;
+color: inherit;
+cursor: pointer;
+      
       position: relative;
 
       display: grid;
@@ -1798,124 +1802,134 @@
 
     function createEventCard(event) {
 
-      const date =
-        eventDate(event);
+  const date =
+    eventDate(event);
 
 
-      if (!date) {
-        return "";
-      }
+  if (!date) {
+    return "";
+  }
 
 
-      const parts =
-        dateParts(date);
+  const parts =
+    dateParts(date);
 
 
-      const location =
-        event.city ||
-        event.address ||
-        "Ελλάδα";
+  const location =
+    event.city ||
+    event.address ||
+    "Ελλάδα";
 
 
-      const store =
-        event.store_name ||
-        "Riftbound Event";
+  const store =
+    event.store_name ||
+    "Riftbound Event";
 
 
-      const url =
-        safeURL(
-          event.event_url
-        );
+  const url =
+    safeURL(
+      event.event_url
+    );
 
 
-      const eventLink =
-        url
-          ? `
-              <a
-                class="event-link"
-                href="${escapeHTML(url)}"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+  const tagName =
+    url ? "a" : "article";
+
+
+  const linkAttributes =
+    url
+      ? `
+          href="${escapeHTML(url)}"
+          target="_blank"
+          rel="noopener noreferrer"
+        `
+      : "";
+
+
+  return `
+    <${tagName}
+      class="event-card"
+      ${linkAttributes}
+    >
+
+      <div class="event-date-box">
+
+        <div class="event-day">
+          ${escapeHTML(parts.day)}
+        </div>
+
+        <div class="event-month">
+          ${escapeHTML(parts.month)}
+        </div>
+
+      </div>
+
+
+      <div class="event-content">
+
+        <div class="event-type">
+          ${escapeHTML(
+            smartEventType(event)
+          )}
+        </div>
+
+        <h4 class="event-title">
+          ${escapeHTML(
+            event.title ||
+            "Riftbound Event"
+          )}
+        </h4>
+
+
+        <div class="event-meta">
+
+          <span class="meta-item">
+            <span class="meta-icon">
+              ◷
+            </span>
+
+            ${escapeHTML(
+              formatTime(date)
+            )}
+          </span>
+
+
+          <span class="meta-item">
+            <span class="meta-icon">
+              ◆
+            </span>
+
+            ${escapeHTML(store)}
+          </span>
+
+
+          <span class="meta-item">
+            <span class="meta-icon">
+              ◎
+            </span>
+
+            ${escapeHTML(location)}
+          </span>
+
+        </div>
+
+
+        ${
+          url
+            ? `
+              <span class="event-link">
                 Δες το event →
-              </a>
+              </span>
             `
-          : "";
+            : ""
+        }
 
+      </div>
 
-      return `
-        <article class="event-card">
+    </${tagName}>
+  `;
 
-          <div class="event-date-box">
-
-            <div class="event-day">
-              ${escapeHTML(parts.day)}
-            </div>
-
-            <div class="event-month">
-              ${escapeHTML(parts.month)}
-            </div>
-
-          </div>
-
-
-          <div class="event-content">
-
-            <div class="event-type">
-              ${escapeHTML(
-                smartEventType(event)
-              )}
-            </div>
-
-            <h4 class="event-title">
-              ${escapeHTML(
-                event.title ||
-                "Riftbound Event"
-              )}
-            </h4>
-
-
-            <div class="event-meta">
-
-              <span class="meta-item">
-                <span class="meta-icon">
-                  ◷
-                </span>
-
-                ${escapeHTML(
-                  formatTime(date)
-                )}
-              </span>
-
-
-              <span class="meta-item">
-                <span class="meta-icon">
-                  ◆
-                </span>
-
-                ${escapeHTML(store)}
-              </span>
-
-
-              <span class="meta-item">
-                <span class="meta-icon">
-                  ◎
-                </span>
-
-                ${escapeHTML(location)}
-              </span>
-
-            </div>
-
-
-            ${eventLink}
-
-          </div>
-
-        </article>
-      `;
-
-    }
+}
 
 
     // ------------------------------------------
