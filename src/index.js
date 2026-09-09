@@ -1,5 +1,9 @@
 export default {
   async fetch(request, env, ctx) {
+    const result = await env.DB
+      .prepare("SELECT COUNT(*) AS count FROM events")
+      .first();
+
     const html = `
 <!DOCTYPE html>
 <html lang="el">
@@ -10,7 +14,8 @@ export default {
 </head>
 <body>
   <h1>Riftbound Events Greece</h1>
-  <p>Η σελίδα λειτουργεί κανονικά.</p>
+  <p>Η βάση δεδομένων λειτουργεί!</p>
+  <p>Events στη βάση: ${result.count}</p>
 </body>
 </html>
     `;
