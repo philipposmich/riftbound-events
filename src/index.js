@@ -150,6 +150,17 @@ function isGreekEvent(event) {
 
 
 
+function safeCoordinate(value) {
+  const number =
+    Number(value);
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+}
+
+
+
 async function syncGreekEvents(
   env,
   greekEvents
@@ -169,6 +180,16 @@ async function syncGreekEvents(
         const externalId =
           `legacy:${event.id}`;
 
+        const latitude =
+          safeCoordinate(
+            event.latitude
+          );
+
+        const longitude =
+          safeCoordinate(
+            event.longitude
+          );
+
 
         return env.DB.prepare(`
           INSERT INTO events (
@@ -180,6 +201,8 @@ async function syncGreekEvents(
             event_type,
             start_time,
             event_url,
+            latitude,
+            longitude,
             status,
             source,
             last_seen_at,
@@ -187,6 +210,8 @@ async function syncGreekEvents(
           )
 
           VALUES (
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -211,6 +236,8 @@ async function syncGreekEvents(
             event_type = excluded.event_type,
             start_time = excluded.start_time,
             event_url = excluded.event_url,
+            latitude = excluded.latitude,
+            longitude = excluded.longitude,
             status = 'active',
             source = 'legacy-locator',
             last_seen_at = CURRENT_TIMESTAMP,
@@ -236,7 +263,11 @@ async function syncGreekEvents(
           event.start_datetime ||
             null,
 
-          `https://locator.riftbound.uvsgames.com/events/${event.id}`
+          `https://locator.riftbound.uvsgames.com/events/${event.id}`,
+
+          latitude,
+
+          longitude
         );
       }
     );
@@ -363,6 +394,8 @@ export default {
             event_type,
             start_time,
             event_url,
+            latitude,
+            longitude,
             status
 
           FROM events
@@ -413,6 +446,8 @@ export default {
             event_type,
             start_time,
             event_url,
+            latitude,
+            longitude,
             status
 
           FROM events
@@ -446,10 +481,6 @@ export default {
 
     /*
       SYNC STATUS
-
-      Το MAX(last_seen_at) αντιστοιχεί
-      στην τελευταία φορά που τα events
-      ενημερώθηκαν επιτυχώς από το sync.
     */
 
     if (
