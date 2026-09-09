@@ -7,6 +7,54 @@
 </head>
 <body>
   <h1>Riftbound Events Greece</h1>
-  <p>Η νέα σελίδα των ελληνικών Riftbound events είναι online.</p>
+
+  <div id="events">
+    Φόρτωση events...
+  </div>
+
+  <script>
+    const API_URL =
+      "https://riftbound-events.philippos-mich.workers.dev/api/events";
+
+    async function loadEvents() {
+      const container = document.getElementById("events");
+
+      try {
+        const response = await fetch(API_URL);
+        const events = await response.json();
+
+        if (!events.length) {
+          container.innerHTML = "<p>Δεν υπάρχουν διαθέσιμα events.</p>";
+          return;
+        }
+
+        container.innerHTML = events.map(event => `
+          <article>
+            <h2>${event.title}</h2>
+            <p><strong>Κατάστημα:</strong> ${event.store_name || "-"}</p>
+            <p><strong>Πόλη:</strong> ${event.city || "-"}</p>
+            <p><strong>Τύπος:</strong> ${event.event_type || "-"}</p>
+            <p><strong>Ημερομηνία:</strong> ${event.start_time || "-"}</p>
+
+            ${
+              event.event_url
+                ? `<p>
+                    <a href="${event.event_url}" target="_blank">
+                      Δες το event
+                    </a>
+                  </p>`
+                : ""
+            }
+          </article>
+        `).join("");
+
+      } catch (error) {
+        container.innerHTML =
+          "<p>Δεν ήταν δυνατή η φόρτωση των events.</p>";
+      }
+    }
+
+    loadEvents();
+  </script>
 </body>
 </html>
