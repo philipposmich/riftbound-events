@@ -4,7 +4,7 @@ const LOCATOR_API =
 const PAGE_SIZE = 250;
 
 // --------------------------------------------------
-// Fetch all upcoming events from the old locator
+// Fetch all upcoming events from the locator
 // --------------------------------------------------
 async function fetchAllLocatorEvents() {
   const startDate = new Date();
@@ -67,7 +67,6 @@ async function fetchAllLocatorEvents() {
 
     page++;
 
-    // Safety stop
     if (page > 20) {
       throw new Error("Safety stop: too many locator pages");
     }
@@ -81,7 +80,7 @@ async function fetchAllLocatorEvents() {
 }
 
 // --------------------------------------------------
-// Check whether an event is in Greece
+// Greece filter
 // --------------------------------------------------
 function isGreekEvent(event) {
   const country = String(
@@ -104,9 +103,20 @@ function isGreekEvent(event) {
 }
 
 // --------------------------------------------------
-// Save Greek events to D1
+// Save events
 // --------------------------------------------------
 async function syncGreekEvents(env, greekEvents) {
+  // Anything not returned by the latest successful sync
+  // becomes inactive.
+  await env.DB
+    .prepare(`
+      UPDATE events
+      SET status = 'inactive',
+          updated_at = CURRENT_TIMESTAMP
+      WHERE source = 'legacy-locator'
+    `)
+    .run();
+
   const statements = greekEvents.map(event => {
     const externalId = `legacy:${event.id}`;
 
@@ -125,7 +135,13 @@ async function syncGreekEvents(env, greekEvents) {
         last_seen_at,
         updated_at
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active', 'legacy-locator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES (
+        ?, ?, ?, ?, ?, ?, ?, ?,
+        'active',
+        'legacy-locator',
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
+      )
 
       ON CONFLICT(external_id)
       DO UPDATE SET
@@ -152,15 +168,35 @@ async function syncGreekEvents(env, greekEvents) {
     );
   });
 
-  // D1 batches in smaller chunks
   const CHUNK_SIZE = 50;
 
   for (let i = 0; i < statements.length; i += CHUNK_SIZE) {
-    const chunk = statements.slice(i, i + CHUNK_SIZE);
-    await env.DB.batch(chunk);
+    await env.DB.batch(
+      statements.slice(i, i + CHUNK_SIZE)
+    );
   }
 
   return statements.length;
+}
+
+// --------------------------------------------------
+// Full sync
+// --------------------------------------------------
+async function runSync(env) {
+  const locator = await fetchAllLocatorEvents();
+
+  const greekEvents =
+    locator.events.filter(isGreekEvent);
+
+  const synced =
+    await syncGreekEvents(env, greekEvents);
+
+  return {
+    locator_total: locator.total,
+    pages_checked: locator.pagesChecked,
+    greek_events_found: greekEvents.length,
+    events_synced: synced
+  };
 }
 
 // --------------------------------------------------
@@ -170,47 +206,14 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // ------------------------------------------------
-    // MANUAL SYNC TEST
-    // ------------------------------------------------
+    // Temporary manual sync endpoint
     if (url.pathname === "/api/sync-test") {
       try {
-        const locator = await fetchAllLocatorEvents();
-
-        const greekEvents =
-          locator.events.filter(isGreekEvent);
-
-        const existingBefore = await env.DB
-          .prepare(`
-            SELECT COUNT(*) AS count
-            FROM events
-            WHERE source = 'legacy-locator'
-          `)
-          .first();
-
-        const synced = await syncGreekEvents(
-          env,
-          greekEvents
-        );
-
-        const existingAfter = await env.DB
-          .prepare(`
-            SELECT COUNT(*) AS count
-            FROM events
-            WHERE source = 'legacy-locator'
-          `)
-          .first();
+        const result = await runSync(env);
 
         return Response.json({
           success: true,
-          locator_total: locator.total,
-          pages_checked: locator.pagesChecked,
-          greek_events_found: greekEvents.length,
-          legacy_events_before_sync:
-            existingBefore?.count || 0,
-          events_synced: synced,
-          legacy_events_after_sync:
-            existingAfter?.count || 0
+          ...result
         });
 
       } catch (error) {
@@ -219,58 +222,11 @@ export default {
             success: false,
             error: String(error)
           },
-          {
-            status: 500
-          }
+          { status: 500 }
         );
       }
     }
 
-    // ------------------------------------------------
-    // READ-ONLY LOCATOR TEST
-    // ------------------------------------------------
-    if (url.pathname === "/api/locator-test") {
-      try {
-        const locator = await fetchAllLocatorEvents();
-
-        const greekEvents =
-          locator.events.filter(isGreekEvent);
-
-        return Response.json({
-          success: true,
-          locator_total: locator.total,
-          pages_checked: locator.pagesChecked,
-          events_downloaded: locator.events.length,
-          greek_events_found: greekEvents.length,
-          greek_events: greekEvents.map(event => ({
-            id: event.id,
-            name: event.name,
-            start_datetime: event.start_datetime,
-            event_type: event.event_type,
-            event_format: event.event_format,
-            address: event.full_address,
-            store_name: event.store?.name || null,
-            city: event.store?.city || null,
-            country: event.store?.country || null
-          }))
-        });
-
-      } catch (error) {
-        return Response.json(
-          {
-            success: false,
-            error: String(error)
-          },
-          {
-            status: 500
-          }
-        );
-      }
-    }
-
-    // ------------------------------------------------
-    // PUBLIC EVENTS API
-    // ------------------------------------------------
     if (url.pathname === "/api/events") {
       const { results } = await env.DB
         .prepare(`
@@ -306,6 +262,12 @@ export default {
             "text/plain; charset=UTF-8"
         }
       }
+    );
+  },
+
+  async scheduled(controller, env, ctx) {
+    ctx.waitUntil(
+      runSync(env)
     );
   }
 };
