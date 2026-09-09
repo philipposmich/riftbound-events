@@ -40,7 +40,6 @@
       --shadow:
         0 18px 45px rgba(41, 28, 52, 0.07);
 
-      --radius: 20px;
       --container: 1180px;
     }
 
@@ -552,9 +551,10 @@
       display: grid;
 
       grid-template-columns:
-        minmax(240px, 1.5fr)
-        minmax(160px, .8fr)
-        minmax(190px, 1fr);
+        minmax(240px, 1.4fr)
+        minmax(150px, .8fr)
+        minmax(180px, 1fr)
+        minmax(160px, .8fr);
 
       gap: 12px;
 
@@ -934,6 +934,16 @@
     /* ---------------------------------
        RESPONSIVE
     --------------------------------- */
+
+    @media (max-width: 1000px) {
+
+      .toolbar {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+    }
+
 
     @media (max-width: 900px) {
 
@@ -1338,6 +1348,51 @@
 
               <option value="">
                 Όλα τα καταστήματα
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <select id="type-filter">
+
+              <option value="">
+                Όλοι οι τύποι
+              </option>
+
+              <option value="Nexus Night">
+                Nexus Night
+              </option>
+
+              <option value="Summoner Skirmish">
+                Summoner Skirmish
+              </option>
+
+              <option value="Local Event">
+                Local Event
+              </option>
+
+              <option value="Pre-Rift">
+                Pre-Rift
+              </option>
+
+              <option value="Showdown">
+                Showdown
+              </option>
+
+              <option value="Regional">
+                Regional
+              </option>
+
+              <option value="Challenge">
+                Challenge
+              </option>
+
+              <option value="Cup">
+                Cup
               </option>
 
             </select>
@@ -2107,6 +2162,14 @@
           .value;
 
 
+      const type =
+        document
+          .getElementById(
+            "type-filter"
+          )
+          .value;
+
+
 
       filteredEvents =
         allEvents.filter(
@@ -2116,6 +2179,10 @@
               getEventCity(event);
 
 
+            const eventType =
+              smartEventType(event);
+
+
             const searchable =
               normalize(
                 [
@@ -2123,7 +2190,7 @@
                   event.store_name,
                   eventCity,
                   event.address,
-                  smartEventType(event)
+                  eventType
                 ]
                 .join(" ")
               );
@@ -2147,10 +2214,16 @@
                 store;
 
 
+            const matchesType =
+              !type ||
+              eventType === type;
+
+
             return (
               matchesSearch &&
               matchesCity &&
-              matchesStore
+              matchesStore &&
+              matchesType
             );
 
           }
@@ -2703,6 +2776,16 @@
     document
       .getElementById(
         "store-filter"
+      )
+      .addEventListener(
+        "change",
+        applyFilters
+      );
+
+
+    document
+      .getElementById(
+        "type-filter"
       )
       .addEventListener(
         "change",
