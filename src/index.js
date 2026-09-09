@@ -164,7 +164,7 @@ async function syncGreekEvents(env, greekEvents) {
       event.full_address || null,
       event.event_type || null,
       event.start_datetime || null,
-      null
+      `https://locator.riftbound.uvsgames.com/events/${event.id}`
     );
   });
 
