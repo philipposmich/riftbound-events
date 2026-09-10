@@ -21,10 +21,47 @@
     rel="stylesheet"
   >
 
+  <script>
+    /*
+      Apply theme before the page is drawn,
+      so dark mode does not flash white first.
+    */
+    (function () {
+      try {
+        const savedTheme =
+          localStorage.getItem(
+            "riftbound-theme"
+          );
+
+        const systemDark =
+          window.matchMedia &&
+          window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+
+        const theme =
+          savedTheme === "dark" ||
+          savedTheme === "light"
+            ? savedTheme
+            : systemDark
+              ? "dark"
+              : "light";
+
+        document.documentElement.dataset.theme =
+          theme;
+      } catch (_) {
+        document.documentElement.dataset.theme =
+          "light";
+      }
+    })();
+  </script>
+
   <style>
     :root {
       --bg: #f7f7f8;
       --surface: #ffffff;
+      --surface-soft: #faf9fb;
+
       --text: #17151a;
       --muted: #746f79;
       --border: #e8e4eb;
@@ -41,6 +78,29 @@
       --container: 1180px;
     }
 
+
+    html[data-theme="dark"] {
+      color-scheme: dark;
+
+      --bg: #0d0a11;
+      --surface: #17121d;
+      --surface-soft: #1c1622;
+
+      --text: #f6f1f8;
+      --muted: #aca2b0;
+      --border: #302839;
+
+      --purple: #b45df4;
+      --purple-dark: #d9a6ff;
+      --purple-light: #281a31;
+
+      --gold: #e4b74a;
+
+      --shadow:
+        0 18px 45px rgba(0, 0, 0, 0.28);
+    }
+
+
     * {
       box-sizing: border-box;
     }
@@ -51,9 +111,12 @@
 
     body {
       margin: 0;
+
       background: var(--bg);
       color: var(--text);
+
       font-family: "Inter", sans-serif;
+
       -webkit-font-smoothing: antialiased;
     }
 
@@ -76,6 +139,7 @@
         calc(100% - 40px),
         var(--container)
       );
+
       margin: 0 auto;
     }
 
@@ -87,11 +151,27 @@
       top: 0;
       z-index: 50;
 
-      background: rgba(255,255,255,.95);
-      border-bottom: 1px solid var(--border);
+      background: rgba(
+        255,
+        255,
+        255,
+        .95
+      );
 
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      border-bottom:
+        1px solid var(--border);
+
+      backdrop-filter:
+        blur(16px);
+
+      -webkit-backdrop-filter:
+        blur(16px);
+    }
+
+    html[data-theme="dark"]
+    .site-header {
+      background:
+        rgba(18, 13, 23, .94);
     }
 
     .header-inner {
@@ -107,6 +187,7 @@
     .brand {
       display: flex;
       align-items: center;
+
       gap: 18px;
 
       min-width: 0;
@@ -114,14 +195,24 @@
 
     .brand-logo {
       display: block;
+
       width: 300px;
       max-width: 52vw;
+
       height: auto;
+    }
+
+    html[data-theme="dark"]
+    .brand-logo {
+      filter:
+        brightness(1.08)
+        contrast(1.02);
     }
 
     .brand-divider {
       width: 1px;
       height: 30px;
+
       background: var(--border);
     }
 
@@ -137,12 +228,59 @@
       white-space: nowrap;
     }
 
+    .header-actions {
+      display: flex;
+      align-items: center;
+
+      gap: 11px;
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 0;
+
+      background: var(--surface);
+      color: var(--purple-dark);
+
+      border:
+        1px solid var(--border);
+
+      border-radius: 12px;
+
+      font-size: 18px;
+
+      transition:
+        transform .18s ease,
+        background .18s ease,
+        border-color .18s ease;
+    }
+
+    .theme-toggle:hover {
+      transform:
+        translateY(-1px);
+
+      background:
+        var(--purple-light);
+
+      border-color:
+        rgba(101,25,168,.3);
+    }
+
     .back-link {
       display: inline-flex;
       align-items: center;
+
       gap: 8px;
 
-      color: #49444d;
+      color: var(--text);
+
+      opacity: .75;
 
       font-size: 14px;
       font-weight: 700;
@@ -152,6 +290,7 @@
 
     .back-link:hover {
       color: var(--purple);
+      opacity: 1;
     }
 
 
@@ -168,7 +307,9 @@
       min-height: 370px;
 
       display: grid;
-      grid-template-columns: 1.25fr .75fr;
+
+      grid-template-columns:
+        1.25fr .75fr;
 
       background:
         radial-gradient(
@@ -183,10 +324,29 @@
           #f4eafa 100%
         );
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 28px;
 
-      box-shadow: var(--shadow);
+      box-shadow:
+        var(--shadow);
+    }
+
+    html[data-theme="dark"]
+    .hero-panel {
+      background:
+        radial-gradient(
+          circle at 85% 30%,
+          rgba(154,65,215,.28),
+          transparent 38%
+        ),
+        linear-gradient(
+          120deg,
+          #17121d 0%,
+          #1b1422 55%,
+          #21152b 100%
+        );
     }
 
     .hero-panel::before {
@@ -214,7 +374,8 @@
       position: relative;
       z-index: 2;
 
-      padding: 58px 28px 48px 58px;
+      padding:
+        58px 28px 48px 58px;
 
       display: flex;
       flex-direction: column;
@@ -224,9 +385,11 @@
     .eyebrow {
       display: inline-flex;
       align-items: center;
+
       gap: 9px;
 
       width: fit-content;
+
       margin-bottom: 18px;
 
       color: var(--purple);
@@ -243,10 +406,12 @@
       height: 9px;
 
       border-radius: 50%;
+
       background: var(--gold);
 
       box-shadow:
-        0 0 0 5px rgba(219,169,46,.15);
+        0 0 0 5px
+        rgba(219,169,46,.15);
     }
 
     .hero h1 {
@@ -254,9 +419,13 @@
 
       max-width: 670px;
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
-      font-size: clamp(38px,5vw,62px);
+      font-size:
+        clamp(38px,5vw,62px);
+
       line-height: 1.04;
 
       letter-spacing: -.035em;
@@ -271,7 +440,7 @@
 
       max-width: 620px;
 
-      color: #69636e;
+      color: var(--muted);
 
       font-size: 17px;
       line-height: 1.7;
@@ -280,20 +449,25 @@
     .sync-note {
       display: inline-flex;
       align-items: center;
+
       gap: 10px;
 
       width: fit-content;
 
       margin-top: 28px;
 
-      padding: 10px 14px;
+      padding:
+        10px 14px;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 999px;
 
-      color: #625d66;
+      color: var(--muted);
 
       font-size: 12px;
       font-weight: 600;
@@ -304,10 +478,12 @@
       height: 8px;
 
       border-radius: 50%;
+
       background: #2faa68;
 
       box-shadow:
-        0 0 0 4px rgba(47,170,104,.12);
+        0 0 0 4px
+        rgba(47,170,104,.12);
     }
 
 
@@ -341,9 +517,16 @@
         );
 
       opacity: .22;
+
       filter: blur(3px);
 
-      transform: translateY(45px);
+      transform:
+        translateY(45px);
+    }
+
+    html[data-theme="dark"]
+    .magic-orb {
+      opacity: .38;
     }
 
     .magic-ring {
@@ -352,10 +535,14 @@
       width: 345px;
       height: 345px;
 
-      border: 1px solid rgba(107,28,170,.22);
+      border:
+        1px solid
+        rgba(107,28,170,.22);
+
       border-radius: 50%;
 
-      transform: translateY(55px);
+      transform:
+        translateY(55px);
     }
 
     .magic-ring::before,
@@ -364,7 +551,10 @@
 
       position: absolute;
 
-      border: 1px solid rgba(219,169,46,.22);
+      border:
+        1px solid
+        rgba(219,169,46,.22);
+
       border-radius: 50%;
     }
 
@@ -390,10 +580,12 @@
       object-fit: cover;
       object-position: center 14%;
 
-      border-radius: 50% 50% 24px 24px;
+      border-radius:
+        50% 50% 24px 24px;
 
       box-shadow:
-        0 30px 60px rgba(65,13,109,.25);
+        0 30px 60px
+        rgba(65,13,109,.25);
     }
 
 
@@ -401,22 +593,36 @@
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3,1fr);
+
+      grid-template-columns:
+        repeat(3,1fr);
 
       gap: 14px;
+
       margin-top: 18px;
     }
 
     .stat-card {
       padding: 22px 24px;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 18px;
 
       box-shadow:
-        0 10px 30px rgba(38,26,46,.04);
+        0 10px 30px
+        rgba(38,26,46,.04);
+    }
+
+    html[data-theme="dark"]
+    .stat-card {
+      box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.16);
     }
 
     .stat-number {
@@ -424,9 +630,12 @@
 
       margin-bottom: 7px;
 
-      color: var(--purple-dark);
+      color:
+        var(--purple-dark);
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 28px;
       line-height: 1;
@@ -446,7 +655,8 @@
     /* EVENTS */
 
     .events-section {
-      padding: 35px 0 80px;
+      padding:
+        35px 0 80px;
     }
 
     .events-heading {
@@ -462,13 +672,16 @@
     .events-heading h2 {
       margin: 0;
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 30px;
     }
 
     .events-heading p {
-      margin: 7px 0 0;
+      margin:
+        7px 0 0;
 
       color: var(--muted);
 
@@ -492,14 +705,18 @@
     }
 
 
-    /* VIEW */
+    /* VIEW SWITCH */
 
     .view-switch {
       display: inline-flex;
 
       padding: 4px;
 
-      background: #eeeaf1;
+      background:
+        var(--surface-soft);
+
+      border:
+        1px solid var(--border);
 
       border-radius: 12px;
     }
@@ -510,22 +727,27 @@
       padding: 0 14px;
 
       border: 0;
+
       border-radius: 9px;
 
       background: transparent;
 
-      color: #766f7a;
+      color: var(--muted);
 
       font-size: 12px;
       font-weight: 800;
     }
 
     .view-button.active {
-      background: white;
-      color: var(--purple-dark);
+      background:
+        var(--surface);
+
+      color:
+        var(--purple-dark);
 
       box-shadow:
-        0 3px 12px rgba(38,21,48,.08);
+        0 3px 12px
+        rgba(38,21,48,.08);
     }
 
 
@@ -556,10 +778,14 @@
 
       padding: 0 16px;
 
-      background: white;
+      background:
+        var(--surface);
+
       color: var(--text);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 14px;
 
       outline: none;
@@ -569,12 +795,18 @@
       padding-left: 45px;
     }
 
+    .field input::placeholder {
+      color: var(--muted);
+    }
+
     .field input:focus,
     .field select:focus {
-      border-color: rgba(101,25,168,.5);
+      border-color:
+        rgba(148,59,208,.6);
 
       box-shadow:
-        0 0 0 4px rgba(101,25,168,.07);
+        0 0 0 4px
+        rgba(101,25,168,.09);
     }
 
     .search-icon {
@@ -583,9 +815,10 @@
       left: 17px;
       top: 50%;
 
-      transform: translateY(-50%);
+      transform:
+        translateY(-50%);
 
-      color: #958e99;
+      color: var(--muted);
     }
 
 
@@ -602,13 +835,17 @@
 
       padding: 13px 15px;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 16px;
 
       box-shadow:
-        0 8px 24px rgba(38,26,46,.035);
+        0 8px 24px
+        rgba(38,26,46,.035);
     }
 
     .proximity-controls {
@@ -629,10 +866,16 @@
 
       padding: 0 16px;
 
-      background: #f7f2fb;
-      color: var(--purple-dark);
+      background:
+        var(--purple-light);
 
-      border: 1px solid #dfcbea;
+      color:
+        var(--purple-dark);
+
+      border:
+        1px solid
+        rgba(150,72,197,.28);
+
       border-radius: 12px;
 
       font-size: 12px;
@@ -647,14 +890,17 @@
     }
 
     .nearby-button:hover {
-      background: var(--purple-light);
+      filter: brightness(1.03);
     }
 
     .nearby-button.active {
-      background: var(--purple);
-      color: white;
+      background:
+        var(--purple);
 
-      border-color: var(--purple);
+      color: #ffffff;
+
+      border-color:
+        var(--purple);
     }
 
     .nearby-button:disabled {
@@ -669,10 +915,14 @@
 
       padding: 0 12px;
 
-      background: white;
+      background:
+        var(--surface);
+
       color: var(--text);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 12px;
 
       outline: none;
@@ -682,17 +932,23 @@
     }
 
     .radius-select:disabled {
-      color: #aaa5ad;
-      background: #f6f5f7;
+      color: var(--muted);
+
+      background:
+        var(--surface-soft);
+
+      opacity: .6;
 
       cursor: not-allowed;
     }
 
     .radius-select:focus {
-      border-color: rgba(101,25,168,.5);
+      border-color:
+        rgba(148,59,208,.6);
 
       box-shadow:
-        0 0 0 4px rgba(101,25,168,.07);
+        0 0 0 4px
+        rgba(101,25,168,.08);
     }
 
     .location-status {
@@ -705,15 +961,18 @@
     }
 
     .location-status.active {
-      color: #625269;
+      color: var(--text);
+      opacity: .75;
     }
 
     .location-status.error {
-      color: #a63d3d;
+      color: #d85b5b;
     }
 
     .distance-meta {
-      color: var(--purple-dark);
+      color:
+        var(--purple-dark);
+
       font-weight: 700;
     }
 
@@ -736,7 +995,9 @@
     .date-heading h3 {
       margin: 0;
 
-      color: #3d3740;
+      color: var(--text);
+
+      opacity: .82;
 
       font-size: 14px;
       font-weight: 800;
@@ -750,7 +1011,8 @@
     .date-line {
       height: 1px;
 
-      background: var(--border);
+      background:
+        var(--border);
 
       flex: 1;
     }
@@ -759,7 +1021,10 @@
       display: grid;
 
       grid-template-columns:
-        repeat(2,minmax(0,1fr));
+        repeat(
+          2,
+          minmax(0,1fr)
+        );
 
       gap: 14px;
     }
@@ -781,9 +1046,12 @@
 
       padding: 20px;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 18px;
 
       color: inherit;
@@ -796,19 +1064,27 @@
     }
 
     .event-card:hover {
-      transform: translateY(-2px);
+      transform:
+        translateY(-2px);
 
       border-color:
-        rgba(101,25,168,.22);
+        rgba(152,67,208,.35);
 
       box-shadow:
-        0 18px 42px rgba(48,29,61,.08);
+        0 18px 42px
+        rgba(48,29,61,.10);
+    }
+
+    html[data-theme="dark"]
+    .event-card:hover {
+      box-shadow:
+        0 18px 42px
+        rgba(0,0,0,.28);
     }
 
     .event-card.is-past {
-      background: #fafafa;
-
-      border-color: #e4e4e6;
+      background:
+        var(--surface-soft);
     }
 
     .event-date-box {
@@ -827,26 +1103,39 @@
           #f4eafa
         );
 
-      border: 1px solid #eadcf4;
+      border:
+        1px solid #eadcf4;
+
       border-radius: 15px;
     }
 
-    .event-card.is-past .event-date-box {
-      background: #f2f2f3;
-      border-color: #dedee1;
+    html[data-theme="dark"]
+    .event-date-box {
+      background:
+        linear-gradient(
+          145deg,
+          #281c32,
+          #22172b
+        );
+
+      border-color: #443151;
+    }
+
+    .event-card.is-past
+    .event-date-box {
+      opacity: .7;
     }
 
     .event-day {
-      color: var(--purple-dark);
+      color:
+        var(--purple-dark);
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 30px;
       line-height: 1;
-    }
-
-    .event-card.is-past .event-day {
-      color: #67626a;
     }
 
     .event-month {
@@ -861,10 +1150,6 @@
       letter-spacing: .08em;
     }
 
-    .event-card.is-past .event-month {
-      color: #807b84;
-    }
-
     .event-content {
       min-width: 0;
     }
@@ -872,7 +1157,9 @@
     .event-title {
       margin: 0;
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 18px;
       line-height: 1.35;
@@ -882,7 +1169,8 @@
       display: flex;
       flex-wrap: wrap;
 
-      gap: 7px 15px;
+      gap:
+        7px 15px;
 
       margin-top: 13px;
 
@@ -913,12 +1201,13 @@
       font-weight: 800;
     }
 
-    .event-card:hover .event-link {
+    .event-card:hover
+    .event-link {
       text-decoration: underline;
     }
 
 
-    /* TYPES */
+    /* EVENT TYPES */
 
     .event-type {
       display: inline-flex;
@@ -928,6 +1217,7 @@
       padding: 5px 8px;
 
       border: 1px solid;
+
       border-radius: 999px;
 
       font-size: 9px;
@@ -985,6 +1275,64 @@
       color: #4b45a3;
     }
 
+
+    html[data-theme="dark"]
+    .type-nexus {
+      background: #30203b;
+      border-color: #68427f;
+      color: #d7a7f3;
+    }
+
+    html[data-theme="dark"]
+    .type-skirmish {
+      background: #342b17;
+      border-color: #705b28;
+      color: #efd074;
+    }
+
+    html[data-theme="dark"]
+    .type-local {
+      background: #28272b;
+      border-color: #46434b;
+      color: #c4bec8;
+    }
+
+    html[data-theme="dark"]
+    .type-prerift {
+      background: #17273b;
+      border-color: #31557b;
+      color: #8fbcec;
+    }
+
+    html[data-theme="dark"]
+    .type-showdown {
+      background: #351d1d;
+      border-color: #713c39;
+      color: #e9948c;
+    }
+
+    html[data-theme="dark"]
+    .type-regional {
+      background: #352719;
+      border-color: #70502d;
+      color: #dcb577;
+    }
+
+    html[data-theme="dark"]
+    .type-challenge {
+      background: #173025;
+      border-color: #32604a;
+      color: #80cea4;
+    }
+
+    html[data-theme="dark"]
+    .type-cup {
+      background: #242342;
+      border-color: #4a4780;
+      color: #aaa5ee;
+    }
+
+
     .past-badge {
       display: inline-flex;
 
@@ -995,10 +1343,13 @@
 
       border-radius: 999px;
 
-      background: #ececef;
-      border: 1px solid #d8d8dd;
+      background:
+        var(--surface-soft);
 
-      color: #66616a;
+      border:
+        1px solid var(--border);
+
+      color: var(--muted);
 
       font-size: 9px;
       font-weight: 800;
@@ -1024,14 +1375,19 @@
     .calendar-archive-note {
       margin-bottom: 14px;
 
-      padding: 12px 15px;
+      padding:
+        12px 15px;
 
-      background: #f5f0f9;
+      background:
+        var(--purple-light);
 
-      border: 1px solid #e6d9ef;
+      border:
+        1px solid
+        rgba(152,67,208,.20);
+
       border-radius: 12px;
 
-      color: #655b6b;
+      color: var(--muted);
 
       font-size: 12px;
       line-height: 1.5;
@@ -1043,13 +1399,17 @@
 
       overflow: hidden;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 20px;
 
       box-shadow:
-        0 12px 35px rgba(40,28,50,.04);
+        0 12px 35px
+        rgba(40,28,50,.04);
     }
 
     .calendar-header {
@@ -1061,15 +1421,19 @@
 
       gap: 16px;
 
-      padding: 14px 20px;
+      padding:
+        14px 20px;
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border);
     }
 
     .calendar-title {
       margin: 0;
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 22px;
 
@@ -1085,18 +1449,24 @@
       width: 40px;
       height: 40px;
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 11px;
 
-      background: white;
-      color: var(--purple-dark);
+      background:
+        var(--surface);
+
+      color:
+        var(--purple-dark);
 
       font-size: 18px;
       font-weight: 800;
     }
 
     .calendar-nav button:hover {
-      background: var(--purple-light);
+      background:
+        var(--purple-light);
     }
 
     .calendar-weekdays {
@@ -1105,9 +1475,13 @@
       display: grid;
 
       grid-template-columns:
-        repeat(7,minmax(0,1fr));
+        repeat(
+          7,
+          minmax(0,1fr)
+        );
 
-      background: #faf9fb;
+      background:
+        var(--surface-soft);
 
       border-bottom:
         1px solid var(--border);
@@ -1116,7 +1490,8 @@
     .calendar-weekday {
       min-width: 0;
 
-      padding: 12px 4px;
+      padding:
+        12px 4px;
 
       text-align: center;
 
@@ -1136,7 +1511,10 @@
       display: grid;
 
       grid-template-columns:
-        repeat(7,minmax(0,1fr));
+        repeat(
+          7,
+          minmax(0,1fr)
+        );
     }
 
     .calendar-day {
@@ -1149,7 +1527,8 @@
 
       padding: 11px;
 
-      background: white;
+      background:
+        var(--surface);
 
       border-right:
         1px solid var(--border);
@@ -1165,26 +1544,31 @@
     }
 
     .calendar-day:hover {
-      background: #fcfaff;
+      background:
+        var(--purple-light);
     }
 
     .calendar-day.empty {
-      background: #fafafa;
+      background:
+        var(--surface-soft);
+
       cursor: default;
     }
 
     .calendar-day.past-day {
-      background: #fbfbfc;
+      background:
+        var(--surface-soft);
     }
 
     .calendar-day.today {
-      background: #fcf8ff;
+      background:
+        var(--purple-light);
     }
 
     .calendar-day.selected {
       box-shadow:
         inset 0 0 0 2px
-        rgba(101,25,168,.55);
+        rgba(152,67,208,.65);
     }
 
     .calendar-day-number {
@@ -1203,12 +1587,17 @@
       font-weight: 800;
     }
 
-    .past-day .calendar-day-number {
-      color: #99949d;
+    .past-day
+    .calendar-day-number {
+      color: var(--muted);
+      opacity: .7;
     }
 
-    .calendar-day.today .calendar-day-number {
-      background: var(--purple);
+    .calendar-day.today
+    .calendar-day-number {
+      background:
+        var(--purple);
+
       color: white;
     }
 
@@ -1229,16 +1618,14 @@
 
       border-radius: 999px;
 
-      background: #f3eff6;
-      color: #625969;
+      background:
+        var(--purple-light);
+
+      color:
+        var(--purple-dark);
 
       font-size: 10px;
       font-weight: 800;
-    }
-
-    .past-day .calendar-count {
-      background: #eeeeef;
-      color: #77727a;
     }
 
     .calendar-event {
@@ -1267,7 +1654,7 @@
     }
 
     .calendar-event.is-past {
-      opacity: .68;
+      opacity: .62;
     }
 
     .calendar-event.type-nexus {
@@ -1318,6 +1705,63 @@
       color: #4b45a3;
     }
 
+
+    html[data-theme="dark"]
+    .calendar-event.type-nexus {
+      background: #30203b;
+      border-color: #68427f;
+      color: #d7a7f3;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-skirmish {
+      background: #342b17;
+      border-color: #705b28;
+      color: #efd074;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-local {
+      background: #28272b;
+      border-color: #46434b;
+      color: #c4bec8;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-prerift {
+      background: #17273b;
+      border-color: #31557b;
+      color: #8fbcec;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-showdown {
+      background: #351d1d;
+      border-color: #713c39;
+      color: #e9948c;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-regional {
+      background: #352719;
+      border-color: #70502d;
+      color: #dcb577;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-challenge {
+      background: #173025;
+      border-color: #32604a;
+      color: #80cea4;
+    }
+
+    html[data-theme="dark"]
+    .calendar-event.type-cup {
+      background: #242342;
+      border-color: #4a4780;
+      color: #aaa5ee;
+    }
+
     .calendar-more-button {
       display: inline-flex;
 
@@ -1341,6 +1785,7 @@
 
     .selected-day-panel {
       margin-top: 24px;
+
       scroll-margin-top: 110px;
     }
 
@@ -1356,7 +1801,9 @@
     .selected-day-heading h3 {
       margin: 0;
 
-      font-family: "Roboto Slab", serif;
+      font-family:
+        "Roboto Slab",
+        serif;
 
       font-size: 20px;
 
@@ -1366,7 +1813,8 @@
     .selected-day-heading-line {
       height: 1px;
 
-      background: var(--border);
+      background:
+        var(--border);
 
       flex: 1;
     }
@@ -1375,11 +1823,15 @@
     /* STATUS */
 
     .status-card {
-      padding: 45px 25px;
+      padding:
+        45px 25px;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 18px;
 
       text-align: center;
@@ -1391,33 +1843,47 @@
       width: 32px;
       height: 32px;
 
-      margin: 0 auto 14px;
+      margin:
+        0 auto 14px;
 
-      border: 3px solid #eee5f4;
-      border-top-color: var(--purple);
+      border:
+        3px solid
+        var(--border);
+
+      border-top-color:
+        var(--purple);
 
       border-radius: 50%;
 
-      animation: spin .75s linear infinite;
+      animation:
+        spin .75s
+        linear infinite;
     }
 
     @keyframes spin {
       to {
-        transform: rotate(360deg);
+        transform:
+          rotate(360deg);
       }
     }
 
     .load-more {
       display: none;
 
-      margin: 28px auto 0;
+      margin:
+        28px auto 0;
 
-      padding: 13px 20px;
+      padding:
+        13px 20px;
 
-      background: white;
+      background:
+        var(--surface);
+
       color: var(--purple);
 
-      border: 1px solid var(--border);
+      border:
+        1px solid var(--border);
+
       border-radius: 999px;
 
       font-size: 13px;
@@ -1430,9 +1896,11 @@
     footer {
       padding: 32px 0;
 
-      background: white;
+      background:
+        var(--surface);
 
-      border-top: 1px solid var(--border);
+      border-top:
+        1px solid var(--border);
     }
 
     .footer-inner {
@@ -1458,7 +1926,10 @@
     @media (max-width:1000px) {
       .toolbar {
         grid-template-columns:
-          repeat(2,minmax(0,1fr));
+          repeat(
+            2,
+            minmax(0,1fr)
+          );
       }
 
       .calendar-day {
@@ -1466,13 +1937,15 @@
       }
     }
 
+
     @media (max-width:900px) {
       .hero-panel {
         grid-template-columns: 1fr;
       }
 
       .hero-copy {
-        padding: 42px 32px 20px;
+        padding:
+          42px 32px 20px;
       }
 
       .hero-rifty {
@@ -1483,6 +1956,7 @@
         grid-template-columns: 1fr;
       }
     }
+
 
     @media (max-width:720px) {
       .container {
@@ -1505,6 +1979,19 @@
         display: none;
       }
 
+      .header-actions {
+        gap: 7px;
+      }
+
+      .theme-toggle {
+        width: 38px;
+        height: 38px;
+
+        border-radius: 11px;
+
+        font-size: 17px;
+      }
+
       .back-link span {
         display: none;
       }
@@ -1518,7 +2005,8 @@
       }
 
       .hero-copy {
-        padding: 36px 24px 15px;
+        padding:
+          36px 24px 15px;
       }
 
       .hero h1 {
@@ -1546,7 +2034,9 @@
       }
 
       .stat-card {
-        padding: 17px 12px;
+        padding:
+          17px 12px;
+
         text-align: center;
       }
 
@@ -1571,7 +2061,8 @@
         width: 100%;
 
         display: flex;
-        justify-content: space-between;
+        justify-content:
+          space-between;
       }
 
       .toolbar {
@@ -1621,7 +2112,8 @@
       .calendar-header {
         min-height: 62px;
 
-        padding: 10px 12px;
+        padding:
+          10px 12px;
       }
 
       .calendar-title {
@@ -1629,7 +2121,8 @@
       }
 
       .calendar-weekday {
-        padding: 10px 2px;
+        padding:
+          10px 2px;
 
         font-size: 8px;
       }
@@ -1656,7 +2149,8 @@
         right: 50%;
         bottom: 5px;
 
-        transform: translateX(50%);
+        transform:
+          translateX(50%);
 
         min-width: 19px;
         height: 19px;
@@ -1673,6 +2167,7 @@
 
       .footer-inner {
         flex-direction: column;
+
         text-align: center;
       }
     }
@@ -1702,13 +2197,29 @@
 
     </div>
 
-    <a
-      class="back-link"
-      href="https://www.riftbound.gr"
-    >
-      ←
-      <span>Riftbound.gr</span>
-    </a>
+
+    <div class="header-actions">
+
+      <button
+        class="theme-toggle"
+        id="theme-toggle"
+        type="button"
+        aria-label="Αλλαγή εμφάνισης"
+        title="Night mode"
+      >
+        ☾
+      </button>
+
+
+      <a
+        class="back-link"
+        href="https://www.riftbound.gr"
+      >
+        ←
+        <span>Riftbound.gr</span>
+      </a>
+
+    </div>
 
   </div>
 
@@ -1992,11 +2503,15 @@
         disabled
         aria-label="Ακτίνα απόστασης"
       >
+
         <option value="25">
           Έως 25 km
         </option>
 
-        <option value="50" selected>
+        <option
+          value="50"
+          selected
+        >
           Έως 50 km
         </option>
 
@@ -2011,6 +2526,7 @@
         <option value="all">
           Όλα
         </option>
+
       </select>
 
     </div>
@@ -2137,25 +2653,25 @@
 
 <footer>
 
-<div class="container footer-inner">
+  <div class="container footer-inner">
 
-  <div>
+    <div>
 
-    <span class="footer-brand">
-      Riftbound.gr
-    </span>
+      <span class="footer-brand">
+        Riftbound.gr
+      </span>
 
-    · Events Greece
+      · Events Greece
+
+    </div>
+
+
+    <div>
+      Τα events ενημερώνονται αυτόματα
+      από την πλατφόρμα Organized Play.
+    </div>
 
   </div>
-
-
-  <div>
-    Τα events ενημερώνονται αυτόματα
-    από την πλατφόρμα Organized Play.
-  </div>
-
-</div>
 
 </footer>
 
@@ -2178,6 +2694,9 @@ const TIME_ZONE =
 const INITIAL_LIMIT = 36;
 const LOAD_MORE_STEP = 36;
 
+const THEME_STORAGE_KEY =
+  "riftbound-theme";
+
 
 let upcomingEvents = [];
 let calendarEvents = [];
@@ -2185,7 +2704,8 @@ let calendarEvents = [];
 let filteredUpcomingEvents = [];
 let filteredCalendarEvents = [];
 
-let visibleLimit = INITIAL_LIMIT;
+let visibleLimit =
+  INITIAL_LIMIT;
 
 
 let currentView =
@@ -2199,15 +2719,106 @@ let currentView =
 let calendarYear;
 let calendarMonth;
 
-let selectedCalendarDateKey = null;
+let selectedCalendarDateKey =
+  null;
 
 
-/*
-  PROXIMITY
-*/
+let userLocation =
+  null;
 
-let userLocation = null;
-let proximityEnabled = false;
+let proximityEnabled =
+  false;
+
+
+
+/* THEME */
+
+function currentTheme() {
+  return (
+    document
+      .documentElement
+      .dataset
+      .theme === "dark"
+  )
+    ? "dark"
+    : "light";
+}
+
+
+
+function updateThemeButton() {
+  const button =
+    document.getElementById(
+      "theme-toggle"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  if (
+    currentTheme() === "dark"
+  ) {
+    button.textContent =
+      "☀";
+
+    button.title =
+      "Light mode";
+
+    button.setAttribute(
+      "aria-label",
+      "Ενεργοποίηση light mode"
+    );
+  }
+
+  else {
+    button.textContent =
+      "☾";
+
+    button.title =
+      "Night mode";
+
+    button.setAttribute(
+      "aria-label",
+      "Ενεργοποίηση night mode"
+    );
+  }
+}
+
+
+
+function setTheme(
+  theme,
+  savePreference = true
+) {
+  document
+    .documentElement
+    .dataset
+    .theme =
+      theme;
+
+  if (savePreference) {
+    try {
+      localStorage.setItem(
+        THEME_STORAGE_KEY,
+        theme
+      );
+    }
+    catch (_) {}
+  }
+
+  updateThemeButton();
+}
+
+
+
+function toggleTheme() {
+  setTheme(
+    currentTheme() === "dark"
+      ? "light"
+      : "dark"
+  );
+}
 
 
 
@@ -2240,7 +2851,8 @@ function safeURL(value) {
       return url.href;
     }
 
-  } catch (_) {}
+  }
+  catch (_) {}
 
   return null;
 }
@@ -2249,7 +2861,9 @@ function safeURL(value) {
 
 function normalize(value) {
   return String(value || "")
-    .toLocaleLowerCase("el-GR")
+    .toLocaleLowerCase(
+      "el-GR"
+    )
     .normalize("NFD")
     .replace(
       /[\u0300-\u036f]/g,
@@ -2269,12 +2883,16 @@ function parseDatabaseUTC(value) {
   const normalized =
     value.includes("T")
       ? value
-      : value.replace(" ", "T");
+      : value.replace(
+          " ",
+          "T"
+        );
 
   const utcValue =
-    /Z$|[+-]\d\d:\d\d$/.test(normalized)
-      ? normalized
-      : `${normalized}Z`;
+    /Z$|[+-]\d\d:\d\d$/
+      .test(normalized)
+        ? normalized
+        : `${normalized}Z`;
 
   const date =
     new Date(utcValue);
@@ -2388,6 +3006,17 @@ async function loadSyncStatus() {
 /* PROXIMITY */
 
 function getEventCoordinates(event) {
+  if (
+    event.latitude === null ||
+    event.latitude === undefined ||
+    event.latitude === "" ||
+    event.longitude === null ||
+    event.longitude === undefined ||
+    event.longitude === ""
+  ) {
+    return null;
+  }
+
   const latitude =
     Number(event.latitude);
 
@@ -2406,6 +3035,13 @@ function getEventCoordinates(event) {
     latitude > 90 ||
     longitude < -180 ||
     longitude > 180
+  ) {
+    return null;
+  }
+
+  if (
+    latitude === 0 &&
+    longitude === 0
   ) {
     return null;
   }
@@ -2686,7 +3322,6 @@ function requestNearbyEvents() {
     return;
   }
 
-
   const button =
     document.getElementById(
       "nearby-button"
@@ -2702,7 +3337,6 @@ function requestNearbyEvents() {
       "location-status"
     );
 
-
   if (
     !navigator.geolocation
   ) {
@@ -2714,7 +3348,6 @@ function requestNearbyEvents() {
 
     return;
   }
-
 
   button.disabled =
     true;
@@ -2729,102 +3362,115 @@ function requestNearbyEvents() {
     "Ζητείται η άδεια τοποθεσίας από τον browser...";
 
 
-  navigator.geolocation.getCurrentPosition(
-    position => {
-      userLocation = {
-        latitude:
-          position.coords.latitude,
+  navigator
+    .geolocation
+    .getCurrentPosition(
 
-        longitude:
-          position.coords.longitude
-      };
+      position => {
+        userLocation = {
+          latitude:
+            position
+              .coords
+              .latitude,
 
-      proximityEnabled =
-        true;
+          longitude:
+            position
+              .coords
+              .longitude
+        };
 
-      button.disabled =
-        false;
+        proximityEnabled =
+          true;
 
-      button.classList.add(
-        "active"
-      );
+        button.disabled =
+          false;
 
-      button.textContent =
-        "✓ Κοντά μου";
+        button
+          .classList
+          .add(
+            "active"
+          );
 
-      radius.disabled =
-        false;
+        button.textContent =
+          "✓ Κοντά μου";
 
-      updateLocationStatus();
+        radius.disabled =
+          false;
 
-      applyFilters();
-    },
+        updateLocationStatus();
 
-    error => {
-      userLocation =
-        null;
-
-      proximityEnabled =
-        false;
-
-      button.disabled =
-        false;
-
-      button.classList.remove(
-        "active"
-      );
-
-      button.textContent =
-        "📍 Κοντά μου";
-
-      radius.disabled =
-        true;
-
-      status.className =
-        "location-status error";
+        applyFilters();
+      },
 
 
-      if (
-        error.code ===
-        error.PERMISSION_DENIED
-      ) {
-        status.textContent =
-          "Δεν δόθηκε άδεια τοποθεσίας. Τα events συνεχίζουν να εμφανίζονται κανονικά.";
+      error => {
+        userLocation =
+          null;
+
+        proximityEnabled =
+          false;
+
+        button.disabled =
+          false;
+
+        button
+          .classList
+          .remove(
+            "active"
+          );
+
+        button.textContent =
+          "📍 Κοντά μου";
+
+        radius.disabled =
+          true;
+
+        status.className =
+          "location-status error";
+
+
+        if (
+          error.code ===
+          error.PERMISSION_DENIED
+        ) {
+          status.textContent =
+            "Δεν δόθηκε άδεια τοποθεσίας. Τα events συνεχίζουν να εμφανίζονται κανονικά.";
+        }
+
+        else if (
+          error.code ===
+          error.POSITION_UNAVAILABLE
+        ) {
+          status.textContent =
+            "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
+        }
+
+        else if (
+          error.code ===
+          error.TIMEOUT
+        ) {
+          status.textContent =
+            "Ο εντοπισμός τοποθεσίας άργησε πολύ. Δοκίμασε ξανά.";
+        }
+
+        else {
+          status.textContent =
+            "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
+        }
+      },
+
+
+      {
+        enableHighAccuracy:
+          false,
+
+        timeout:
+          12000,
+
+        maximumAge:
+          300000
       }
-
-      else if (
-        error.code ===
-        error.POSITION_UNAVAILABLE
-      ) {
-        status.textContent =
-          "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
-      }
-
-      else if (
-        error.code ===
-        error.TIMEOUT
-      ) {
-        status.textContent =
-          "Ο εντοπισμός τοποθεσίας άργησε πολύ. Δοκίμασε ξανά.";
-      }
-
-      else {
-        status.textContent =
-          "Δεν ήταν δυνατός ο εντοπισμός της τοποθεσίας σου.";
-      }
-    },
-
-    {
-      enableHighAccuracy:
-        false,
-
-      timeout:
-        12000,
-
-      maximumAge:
-        300000
-    }
-  );
+    );
 }
 
 
@@ -2872,9 +3518,14 @@ function canonicalCityName(city) {
     "skydra": "Σκύδρα",
     "σκυδρα": "Σκύδρα",
 
-    "ag. dimitrios": "Άγιος Δημήτριος",
-    "agios dimitrios": "Άγιος Δημήτριος",
-    "αγιος δημητριος": "Άγιος Δημήτριος",
+    "ag. dimitrios":
+      "Άγιος Δημήτριος",
+
+    "agios dimitrios":
+      "Άγιος Δημήτριος",
+
+    "αγιος δημητριος":
+      "Άγιος Δημήτριος",
 
     "chalandri": "Χαλάνδρι",
     "halandri": "Χαλάνδρι",
@@ -2907,13 +3558,23 @@ function canonicalCityName(city) {
     "amarousio": "Μαρούσι",
     "μαρουσι": "Μαρούσι",
 
-    "nea erithrea": "Νέα Ερυθραία",
-    "nea erythraia": "Νέα Ερυθραία",
-    "νεα ερυθραια": "Νέα Ερυθραία",
+    "nea erithrea":
+      "Νέα Ερυθραία",
 
-    "neo irakleio": "Νέο Ηράκλειο",
-    "neo iraklio": "Νέο Ηράκλειο",
-    "νεο ηρακλειο": "Νέο Ηράκλειο",
+    "nea erythraia":
+      "Νέα Ερυθραία",
+
+    "νεα ερυθραια":
+      "Νέα Ερυθραία",
+
+    "neo irakleio":
+      "Νέο Ηράκλειο",
+
+    "neo iraklio":
+      "Νέο Ηράκλειο",
+
+    "νεο ηρακλειο":
+      "Νέο Ηράκλειο",
 
     "patra": "Πάτρα",
     "patras": "Πάτρα",
@@ -2937,7 +3598,10 @@ function canonicalCityName(city) {
     "βολος": "Βόλος"
   };
 
-  return cityMap[key] || value;
+  return (
+    cityMap[key] ||
+    value
+  );
 }
 
 
@@ -2950,8 +3614,10 @@ function getEventCity(event) {
   }
 
   const address =
-    String(event.address || "")
-      .trim();
+    String(
+      event.address || ""
+    )
+    .trim();
 
   if (!address) {
     return "";
@@ -2961,7 +3627,8 @@ function getEventCity(event) {
     address
       .split(",")
       .map(
-        part => part.trim()
+        part =>
+          part.trim()
       )
       .filter(Boolean);
 
@@ -2974,8 +3641,11 @@ function getEventCity(event) {
   ];
 
   for (
-    let i = parts.length - 1;
+    let i =
+      parts.length - 1;
+
     i >= 0;
+
     i--
   ) {
     let part =
@@ -2985,14 +3655,17 @@ function getEventCity(event) {
       normalize(part);
 
     if (
-      countries.includes(lower)
+      countries
+        .includes(lower)
     ) {
       continue;
     }
 
     if (
-      /^\d{5}$/.test(part) ||
-      /^\d{3}\s?\d{2}$/.test(part)
+      /^\d{5}$/
+        .test(part) ||
+      /^\d{3}\s?\d{2}$/
+        .test(part)
     ) {
       continue;
     }
@@ -3302,6 +3975,7 @@ function populatePageData(events) {
     )
   ];
 
+
   document
     .getElementById(
       "events-count"
@@ -3309,12 +3983,14 @@ function populatePageData(events) {
     .textContent =
       events.length;
 
+
   document
     .getElementById(
       "stores-count"
     )
     .textContent =
       stores.length;
+
 
   document
     .getElementById(
@@ -3422,7 +4098,9 @@ function eventMatchesFilters(
   return (
     (
       !search ||
-      searchable.includes(search)
+      searchable.includes(
+        search
+      )
     )
     &&
     (
@@ -3432,7 +4110,8 @@ function eventMatchesFilters(
     &&
     (
       !store ||
-      event.store_name === store
+      event.store_name ===
+        store
     )
     &&
     (
@@ -3440,7 +4119,9 @@ function eventMatchesFilters(
       eventType === type
     )
     &&
-    eventMatchesProximity(event)
+    eventMatchesProximity(
+      event
+    )
   );
 }
 
@@ -3596,7 +4277,9 @@ function createEventCard(event) {
 
   const distance =
     proximityEnabled
-      ? getEventDistance(event)
+      ? getEventDistance(
+          event
+        )
       : null;
 
   const tagName =
@@ -3645,6 +4328,7 @@ function createEventCard(event) {
         >
           ${escapeHTML(type)}
         </div>
+
 
         ${
           past
@@ -3758,17 +4442,21 @@ function renderListView() {
       "load-more"
     );
 
+
   if (
-    filteredUpcomingEvents.length === 0
+    filteredUpcomingEvents
+      .length === 0
   ) {
     container.innerHTML =
       `
         <div class="status-card">
+
           ${
             proximityEnabled
               ? "Δεν βρέθηκαν events στην επιλεγμένη ακτίνα."
               : "Δεν βρέθηκαν events με αυτά τα φίλτρα."
           }
+
         </div>
       `;
 
@@ -3780,13 +4468,16 @@ function renderListView() {
 
 
   const visibleEvents =
-    filteredUpcomingEvents.slice(
-      0,
-      visibleLimit
-    );
+    filteredUpcomingEvents
+      .slice(
+        0,
+        visibleLimit
+      );
+
 
   const groups =
     new Map();
+
 
   visibleEvents.forEach(
     event => {
@@ -3820,7 +4511,9 @@ function renderListView() {
   );
 
 
-  if (proximityEnabled) {
+  if (
+    proximityEnabled
+  ) {
     groups.forEach(
       group => {
         group.events.sort(
@@ -3855,6 +4548,7 @@ function renderListView() {
 
 
   let html = "";
+
 
   groups.forEach(
     group => {
@@ -3893,12 +4587,15 @@ function renderListView() {
     }
   );
 
+
   container.innerHTML =
     html;
 
+
   loadMore.style.display =
     visibleLimit <
-    filteredUpcomingEvents.length
+    filteredUpcomingEvents
+      .length
       ? "block"
       : "none";
 }
@@ -3929,35 +4626,39 @@ function eventsByDate() {
   const map =
     new Map();
 
-  filteredCalendarEvents.forEach(
-    event => {
-      const date =
-        eventDate(event);
 
-      if (!date) {
-        return;
+  filteredCalendarEvents
+    .forEach(
+      event => {
+        const date =
+          eventDate(event);
+
+        if (!date) {
+          return;
+        }
+
+        const key =
+          athensDateKey(date);
+
+        if (
+          !map.has(key)
+        ) {
+          map.set(
+            key,
+            []
+          );
+        }
+
+        map
+          .get(key)
+          .push(event);
       }
-
-      const key =
-        athensDateKey(date);
-
-      if (
-        !map.has(key)
-      ) {
-        map.set(
-          key,
-          []
-        );
-      }
-
-      map
-        .get(key)
-        .push(event);
-    }
-  );
+    );
 
 
-  if (proximityEnabled) {
+  if (
+    proximityEnabled
+  ) {
     map.forEach(
       events => {
         events.sort(
@@ -4023,7 +4724,9 @@ function formatCalendarMonth(
 
 
 
-function formatSelectedDateKey(key) {
+function formatSelectedDateKey(
+  key
+) {
   const [
     year,
     month,
@@ -4058,7 +4761,9 @@ function formatSelectedDateKey(key) {
 
 
 
-function renderSelectedCalendarDay(map) {
+function renderSelectedCalendarDay(
+  map
+) {
   const panel =
     document.getElementById(
       "selected-day-panel"
@@ -4071,10 +4776,12 @@ function renderSelectedCalendarDay(map) {
     return;
   }
 
+
   const events =
     map.get(
       selectedCalendarDateKey
     ) || [];
+
 
   if (
     events.length === 0
@@ -4082,6 +4789,7 @@ function renderSelectedCalendarDay(map) {
     panel.innerHTML =
       `
         <div class="status-card">
+
           Δεν υπάρχουν καταγεγραμμένα
           events αυτή την ημέρα
           ${
@@ -4089,11 +4797,13 @@ function renderSelectedCalendarDay(map) {
               ? "στην επιλεγμένη ακτίνα."
               : "."
           }
+
         </div>
       `;
 
     return;
   }
+
 
   panel.innerHTML =
     `
@@ -4149,6 +4859,7 @@ function showCalendarDay(
 
   renderCalendarView();
 
+
   if (
     shouldScroll
   ) {
@@ -4183,6 +4894,7 @@ function renderCalendarView() {
   const map =
     eventsByDate();
 
+
   title.textContent =
     formatCalendarMonth(
       calendarYear,
@@ -4200,13 +4912,16 @@ function renderCalendarView() {
       )
     );
 
+
   const nativeWeekday =
     firstDay.getUTCDay();
+
 
   const mondayOffset =
     nativeWeekday === 0
       ? 6
       : nativeWeekday - 1;
+
 
   const daysInMonth =
     new Date(
@@ -4219,10 +4934,12 @@ function renderCalendarView() {
     )
     .getUTCDate();
 
+
   const todayKey =
     athensDateKey(
       new Date()
     );
+
 
   let html = "";
 
@@ -4373,6 +5090,7 @@ function renderCalendarView() {
 
   grid.innerHTML =
     html;
+
 
   renderSelectedCalendarDay(
     map
@@ -4592,8 +5310,10 @@ async function loadEvents() {
         new Date()
       );
 
+
     calendarYear =
       nowParts.year;
+
 
     calendarMonth =
       nowParts.month - 1;
@@ -4628,6 +5348,16 @@ async function loadEvents() {
 
 
 /* LISTENERS */
+
+document
+  .getElementById(
+    "theme-toggle"
+  )
+  .addEventListener(
+    "click",
+    toggleTheme
+  );
+
 
 document
   .getElementById(
@@ -4807,9 +5537,7 @@ document
           ".calendar-event"
         );
 
-      if (
-        eventLink
-      ) {
+      if (eventLink) {
         return;
       }
 
@@ -4819,9 +5547,7 @@ document
           ".calendar-more-button"
         );
 
-      if (
-        moreButton
-      ) {
+      if (moreButton) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -4853,6 +5579,45 @@ document
     }
   );
 
+
+/*
+  If there is no manual preference,
+  continue following the device theme.
+*/
+
+if (
+  window.matchMedia
+) {
+  const systemTheme =
+    window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    );
+
+  systemTheme.addEventListener(
+    "change",
+    event => {
+      try {
+        const saved =
+          localStorage.getItem(
+            THEME_STORAGE_KEY
+          );
+
+        if (!saved) {
+          setTheme(
+            event.matches
+              ? "dark"
+              : "light",
+            false
+          );
+        }
+      }
+      catch (_) {}
+    }
+  );
+}
+
+
+updateThemeButton();
 
 loadEvents();
 loadSyncStatus();
