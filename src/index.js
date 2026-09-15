@@ -26,11 +26,6 @@ const PLAYRIFTBOUND_PAGE_SIZE =
 const PLAYRIFTBOUND_MAX_PAGES_PER_AREA =
   20;
 
-/*
-  Safety limit ώστε να μη φύγουμε
-  σε υπερβολικό αριθμό requests
-  αν αλλάξει κάτι απρόβλεπτα στο API.
-*/
 const PLAYRIFTBOUND_MAX_TOTAL_REQUESTS =
   45;
 
@@ -40,21 +35,6 @@ const PLAYRIFTBOUND_OPERATION =
 const PLAYRIFTBOUND_QUERY_HASH =
   "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
 
-
-/*
-  SEARCH AREAS
-
-  Η ακτίνα που έχουμε επιβεβαιώσει ότι
-  δέχεται το PlayRiftbound είναι 32.187 km.
-
-  Χρησιμοποιούμε πολλά regional hubs
-  ώστε να καλύπτουμε την ελληνική
-  Organized Play σκηνή σε όλη τη χώρα.
-
-  Τα ίδια tournaments μπορεί να βρεθούν
-  από πάνω από ένα search point.
-  Γίνεται dedupe με tournament.id.
-*/
 
 const PLAYRIFTBOUND_SEARCH_AREAS = [
   {
@@ -1002,19 +982,10 @@ function normalizePlayRiftboundEvent(
   const tournamentId =
     tournament.id;
 
-  const organizerId =
-    organizer.id;
-
-  let eventURL =
-    "https://playriftbound.com/en-US/events";
-
-  if (
-    organizerId &&
+  const eventURL =
     tournamentId
-  ) {
-    eventURL =
-      `https://rgn.playriftbound.com/en-US/org/${encodeURIComponent(organizerId)}/events/${encodeURIComponent(tournamentId)}`;
-  }
+      ? `https://playriftbound.com/en-US/events/${encodeURIComponent(tournamentId)}`
+      : "https://playriftbound.com/en-US/events";
 
   return {
     external_id:
@@ -1068,17 +1039,6 @@ function normalizePlayRiftboundEvent(
 
 /*
   SAFE D1 SYNC
-
-  Πρώτα γράφονται όλα τα νέα events.
-
-  Μόνο αφού ολοκληρωθεί επιτυχώς
-  ολόκληρη η αναζήτηση της πηγής,
-  γίνονται inactive όσα δεν εμφανίστηκαν.
-
-  Αν αποτύχει οποιοδήποτε regional search,
-  το PlayRiftbound sync αποτυγχάνει συνολικά
-  και η προηγούμενη σωστή κατάσταση μένει
-  στη D1.
 */
 
 async function syncSourceEvents(
@@ -1339,11 +1299,6 @@ async function syncPlayRiftboundSource(
 
 /*
   COMPLETE SYNC
-
-  Legacy + PlayRiftbound είναι ανεξάρτητα.
-
-  Αν το ένα source αποτύχει,
-  το άλλο συνεχίζει να ενημερώνεται.
 */
 
 async function runSync(
@@ -1410,18 +1365,6 @@ async function runSync(
 
 /*
   FRONTEND DEDUPLICATION
-
-  Τα δύο sources μπορούν προσωρινά
-  να έχουν το ίδιο event.
-
-  Αν είναι:
-  - διαφορετικές πηγές
-  - ίδιο κατάστημα / σχεδόν ίδιο σημείο
-  - ώρα έναρξης μέσα σε 5 λεπτά
-
-  θεωρείται το ίδιο event.
-
-  Προτεραιότητα έχει το PlayRiftbound.
 */
 
 function sourcePriority(
@@ -1820,10 +1763,6 @@ export default {
       );
 
 
-    /*
-      MANUAL SYNC TEST
-    */
-
     if (
       url.pathname ===
       "/api/sync-test"
@@ -1860,10 +1799,6 @@ export default {
     }
 
 
-    /*
-      UPCOMING EVENTS
-    */
-
     if (
       url.pathname ===
       "/api/events"
@@ -1879,10 +1814,6 @@ export default {
     }
 
 
-    /*
-      CALENDAR + ARCHIVE
-    */
-
     if (
       url.pathname ===
       "/api/calendar-events"
@@ -1897,10 +1828,6 @@ export default {
       );
     }
 
-
-    /*
-      STATUS
-    */
 
     if (
       url.pathname ===
