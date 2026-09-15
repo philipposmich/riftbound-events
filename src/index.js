@@ -4,281 +4,77 @@ const LEGACY_LOCATOR_API =
 const PLAYRIFTBOUND_GQL =
   "https://playriftbound.com/api/gql";
 
+const LEGACY_PAGE_SIZE = 250;
 
-/*
-  LEGACY LOCATOR
-*/
-
-const LEGACY_PAGE_SIZE =
-  250;
-
-
-/*
-  PLAYRIFTBOUND
-*/
-
-const PLAYRIFTBOUND_RADIUS_METERS =
-  32187;
-
-const PLAYRIFTBOUND_PAGE_SIZE =
-  20;
-
-const PLAYRIFTBOUND_MAX_PAGES_PER_AREA =
-  20;
-
-const PLAYRIFTBOUND_MAX_TOTAL_REQUESTS =
-  45;
-
-const PLAYRIFTBOUND_OPERATION =
-  "CompeteTournamentSearch";
-
+const PLAYRIFTBOUND_RADIUS_METERS = 32187;
+const PLAYRIFTBOUND_PAGE_SIZE = 20;
+const PLAYRIFTBOUND_MAX_PAGES_PER_AREA = 20;
+const PLAYRIFTBOUND_MAX_TOTAL_REQUESTS = 45;
+const PLAYRIFTBOUND_OPERATION = "CompeteTournamentSearch";
 const PLAYRIFTBOUND_QUERY_HASH =
   "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
 
-
 const PLAYRIFTBOUND_SEARCH_AREAS = [
-  {
-    name: "Athens",
-    latitude: 37.9842,
-    longitude: 23.7353
-  },
-
-  {
-    name: "Chalkida",
-    latitude: 38.4636,
-    longitude: 23.5994
-  },
-
-  {
-    name: "Corinth",
-    latitude: 37.9386,
-    longitude: 22.9322
-  },
-
-  {
-    name: "Patras",
-    latitude: 38.2466,
-    longitude: 21.7346
-  },
-
-  {
-    name: "Kalamata",
-    latitude: 37.0389,
-    longitude: 22.1142
-  },
-
-  {
-    name: "Tripoli",
-    latitude: 37.5101,
-    longitude: 22.3726
-  },
-
-  {
-    name: "Lamia",
-    latitude: 38.8993,
-    longitude: 22.4332
-  },
-
-  {
-    name: "Volos",
-    latitude: 39.3610,
-    longitude: 22.9426
-  },
-
-  {
-    name: "Larisa",
-    latitude: 39.6390,
-    longitude: 22.4191
-  },
-
-  {
-    name: "Trikala",
-    latitude: 39.5557,
-    longitude: 21.7679
-  },
-
-  {
-    name: "Ioannina",
-    latitude: 39.6650,
-    longitude: 20.8537
-  },
-
-  {
-    name: "Agrinio",
-    latitude: 38.6214,
-    longitude: 21.4078
-  },
-
-  {
-    name: "Thessaloniki",
-    latitude: 40.6401,
-    longitude: 22.9444
-  },
-
-  {
-    name: "Skydra",
-    latitude: 40.7680,
-    longitude: 22.1514
-  },
-
-  {
-    name: "Kozani",
-    latitude: 40.3007,
-    longitude: 21.7889
-  },
-
-  {
-    name: "Serres",
-    latitude: 41.0909,
-    longitude: 23.5413
-  },
-
-  {
-    name: "Kavala",
-    latitude: 40.9396,
-    longitude: 24.4069
-  },
-
-  {
-    name: "Xanthi",
-    latitude: 41.1349,
-    longitude: 24.8880
-  },
-
-  {
-    name: "Komotini",
-    latitude: 41.1192,
-    longitude: 25.4054
-  },
-
-  {
-    name: "Alexandroupoli",
-    latitude: 40.8457,
-    longitude: 25.8739
-  },
-
-  {
-    name: "Corfu",
-    latitude: 39.6243,
-    longitude: 19.9217
-  },
-
-  {
-    name: "Zakynthos",
-    latitude: 37.7870,
-    longitude: 20.8999
-  },
-
-  {
-    name: "Heraklion",
-    latitude: 35.3387,
-    longitude: 25.1442
-  },
-
-  {
-    name: "Chania",
-    latitude: 35.5138,
-    longitude: 24.0180
-  },
-
-  {
-    name: "Rhodes",
-    latitude: 36.4341,
-    longitude: 28.2176
-  },
-
-  {
-    name: "Kos",
-    latitude: 36.8937,
-    longitude: 27.2877
-  },
-
-  {
-    name: "Mytilene",
-    latitude: 39.1079,
-    longitude: 26.5553
-  },
-
-  {
-    name: "Chios",
-    latitude: 38.3688,
-    longitude: 26.1358
-  },
-
-  {
-    name: "Samos",
-    latitude: 37.7548,
-    longitude: 26.9770
-  },
-
-  {
-    name: "Syros",
-    latitude: 37.4447,
-    longitude: 24.9429
-  }
+  { name: "Athens", latitude: 37.9842, longitude: 23.7353 },
+  { name: "Chalkida", latitude: 38.4636, longitude: 23.5994 },
+  { name: "Corinth", latitude: 37.9386, longitude: 22.9322 },
+  { name: "Patras", latitude: 38.2466, longitude: 21.7346 },
+  { name: "Kalamata", latitude: 37.0389, longitude: 22.1142 },
+  { name: "Tripoli", latitude: 37.5101, longitude: 22.3726 },
+  { name: "Lamia", latitude: 38.8993, longitude: 22.4332 },
+  { name: "Volos", latitude: 39.3610, longitude: 22.9426 },
+  { name: "Larisa", latitude: 39.6390, longitude: 22.4191 },
+  { name: "Trikala", latitude: 39.5557, longitude: 21.7679 },
+  { name: "Ioannina", latitude: 39.6650, longitude: 20.8537 },
+  { name: "Agrinio", latitude: 38.6214, longitude: 21.4078 },
+  { name: "Thessaloniki", latitude: 40.6401, longitude: 22.9444 },
+  { name: "Skydra", latitude: 40.7680, longitude: 22.1514 },
+  { name: "Kozani", latitude: 40.3007, longitude: 21.7889 },
+  { name: "Serres", latitude: 41.0909, longitude: 23.5413 },
+  { name: "Kavala", latitude: 40.9396, longitude: 24.4069 },
+  { name: "Xanthi", latitude: 41.1349, longitude: 24.8880 },
+  { name: "Komotini", latitude: 41.1192, longitude: 25.4054 },
+  { name: "Alexandroupoli", latitude: 40.8457, longitude: 25.8739 },
+  { name: "Corfu", latitude: 39.6243, longitude: 19.9217 },
+  { name: "Zakynthos", latitude: 37.7870, longitude: 20.8999 },
+  { name: "Heraklion", latitude: 35.3387, longitude: 25.1442 },
+  { name: "Chania", latitude: 35.5138, longitude: 24.0180 },
+  { name: "Rhodes", latitude: 36.4341, longitude: 28.2176 },
+  { name: "Kos", latitude: 36.8937, longitude: 27.2877 },
+  { name: "Mytilene", latitude: 39.1079, longitude: 26.5553 },
+  { name: "Chios", latitude: 38.3688, longitude: 26.1358 },
+  { name: "Samos", latitude: 37.7548, longitude: 26.9770 },
+  { name: "Syros", latitude: 37.4447, longitude: 24.9429 }
 ];
-
-
-/*
-  GENERAL HELPERS
-*/
 
 function normalizeText(value) {
   return String(value || "")
     .trim()
     .toLocaleLowerCase("el-GR")
     .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    );
+    .replace(/[\u0300-\u036f]/g, "");
 }
-
 
 function normalizeVenueName(value) {
-  return normalizeText(value)
-    .replace(
-      /[^\p{L}\p{N}]+/gu,
-      ""
-    );
+  return normalizeText(value).replace(/[^\p{L}\p{N}]+/gu, "");
 }
 
-
 function safeCoordinate(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return null;
-  }
+  if (value === null || value === undefined || value === "") return null;
 
-  const number =
-    Number(value);
+  const number = Number(value);
 
   return Number.isFinite(number)
     ? number
     : null;
 }
 
-
 function degreesToRadians(value) {
-  return (
-    value *
-    Math.PI /
-    180
-  );
+  return value * Math.PI / 180;
 }
 
-
-function distanceKm(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-) {
-  const radius =
-    6371;
+function distanceKm(lat1, lon1, lat2, lon2) {
+  const earthRadiusKm = 6371;
 
   const dLat =
     degreesToRadians(
@@ -290,43 +86,40 @@ function distanceKm(
       lon2 - lon1
     );
 
-  const a =
-    Math.sin(
-      dLat / 2
-    ) ** 2
-    +
-    Math.cos(
-      degreesToRadians(
-        lat1
-      )
-    )
-    *
-    Math.cos(
-      degreesToRadians(
-        lat2
-      )
-    )
-    *
-    Math.sin(
-      dLon / 2
-    ) ** 2;
+  const rLat1 =
+    degreesToRadians(
+      lat1
+    );
 
-  const c =
-    2 *
+  const rLat2 =
+    degreesToRadians(
+      lat2
+    );
+
+  const a =
+    Math.sin(dLat / 2) ** 2
+    +
+    Math.cos(rLat1)
+    *
+    Math.cos(rLat2)
+    *
+    Math.sin(dLon / 2) ** 2;
+
+  return (
+    earthRadiusKm
+    *
+    2
+    *
     Math.atan2(
       Math.sqrt(a),
       Math.sqrt(1 - a)
-    );
-
-  return (
-    radius *
-    c
+    )
   );
 }
 
 
 /*
-  LEGACY SOURCE
+  LEGACY LOCATOR
 */
 
 async function fetchAllLegacyEvents() {
@@ -445,12 +238,10 @@ async function fetchAllLegacyEvents() {
     total,
     pagesChecked:
       page,
-
     events:
       allEvents
   };
 }
-
 
 function isGreekLegacyEvent(event) {
   const country =
@@ -477,7 +268,6 @@ function isGreekLegacyEvent(event) {
     )
   );
 }
-
 
 function normalizeLegacyEvent(event) {
   return {
@@ -530,17 +320,15 @@ function normalizeLegacyEvent(event) {
 
 
 /*
-  PLAYRIFTBOUND SOURCE
+  PLAYRIFTBOUND
 */
 
-function playRiftboundEventType(
-  value
-) {
+function playRiftboundEventType(value) {
   const type =
     String(
       value || ""
     )
-    .toUpperCase();
+      .toUpperCase();
 
   const types = {
     NEXUS_NIGHT:
@@ -571,7 +359,6 @@ function playRiftboundEventType(
     null
   );
 }
-
 
 function buildPlayRiftboundURL(
   area,
@@ -649,7 +436,6 @@ function buildPlayRiftboundURL(
   );
 }
 
-
 async function fetchPlayRiftboundPage(
   area,
   after = null
@@ -665,7 +451,7 @@ async function fetchPlayRiftboundPage(
           "GET",
 
         headers: {
-          "accept":
+          accept:
             "application/graphql-response+json,application/json;q=0.9",
 
           "accept-language":
@@ -680,7 +466,7 @@ async function fetchPlayRiftboundPage(
           "apollographql-client-version":
             "230eb7a",
 
-          "referer":
+          referer:
             "https://playriftbound.com/en-US/events"
         }
       }
@@ -767,7 +553,6 @@ async function fetchPlayRiftboundPage(
   };
 }
 
-
 async function fetchPlayRiftboundArea(
   area,
   requestCounter
@@ -792,7 +577,6 @@ async function fetchPlayRiftboundArea(
     }
 
     page++;
-
     requestCounter.count++;
 
     const result =
@@ -870,7 +654,6 @@ async function fetchPlayRiftboundArea(
   };
 }
 
-
 async function fetchAllPlayRiftboundEvents() {
   const allEventsById =
     new Map();
@@ -879,7 +662,8 @@ async function fetchAllPlayRiftboundEvents() {
     [];
 
   const requestCounter = {
-    count: 0
+    count:
+      0
   };
 
   for (
@@ -939,7 +723,6 @@ async function fetchAllPlayRiftboundEvents() {
   };
 }
 
-
 function isGreekPlayRiftboundEvent(
   node
 ) {
@@ -954,14 +737,12 @@ function isGreekPlayRiftboundEvent(
   return (
     address.includes(
       "greece"
-    )
-    ||
+    ) ||
     address.includes(
       "ελλαδα"
     )
   );
 }
-
 
 function normalizePlayRiftboundEvent(
   node
@@ -981,11 +762,6 @@ function normalizePlayRiftboundEvent(
 
   const tournamentId =
     tournament.id;
-
-  const eventURL =
-    tournamentId
-      ? `https://playriftbound.com/en-US/events/${encodeURIComponent(tournamentId)}`
-      : "https://playriftbound.com/en-US/events";
 
   return {
     external_id:
@@ -1019,7 +795,9 @@ function normalizePlayRiftboundEvent(
       null,
 
     event_url:
-      eventURL,
+      tournamentId
+        ? `https://playriftbound.com/en-US/events/${encodeURIComponent(tournamentId)}`
+        : "https://playriftbound.com/en-US/events",
 
     latitude:
       safeCoordinate(
@@ -1038,7 +816,7 @@ function normalizePlayRiftboundEvent(
 
 
 /*
-  SAFE D1 SYNC
+  D1 SYNC
 */
 
 async function syncSourceEvents(
@@ -1187,21 +965,16 @@ async function syncSourceEvents(
         OR last_seen_at <> ?
       )
   `)
-  .bind(
-    source,
-    syncStamp
-  )
-  .run();
+    .bind(
+      source,
+      syncStamp
+    )
+    .run();
 
   return (
     events.length
   );
 }
-
-
-/*
-  SOURCE RUNNERS
-*/
 
 async function syncLegacySource(
   env
@@ -1245,7 +1018,6 @@ async function syncLegacySource(
       synced
   };
 }
-
 
 async function syncPlayRiftboundSource(
   env
@@ -1295,11 +1067,6 @@ async function syncPlayRiftboundSource(
       result.areaResults
   };
 }
-
-
-/*
-  COMPLETE SYNC
-*/
 
 async function runSync(
   env
@@ -1364,235 +1131,182 @@ async function runSync(
 
 
 /*
-  FRONTEND DEDUPLICATION
+  FAST DEDUPE
+
+  PlayRiftbound έχει προτεραιότητα.
+  Δεν συγκρίνουμε πλέον κάθε event με όλα
+  τα υπόλοιπα, για να μη χτυπάει το CPU limit.
 */
 
-function sourcePriority(
+const DEDUPE_TIME_WINDOW_MS =
+  5 * 60 * 1000;
+
+function prepareEventForDedupe(
   event
 ) {
-  if (
-    event.source ===
-    "playriftbound"
-  ) {
-    return 2;
-  }
+  const time =
+    Date.parse(
+      event.start_time
+    );
 
-  if (
-    event.source ===
-    "legacy-locator"
-  ) {
-    return 1;
-  }
+  return {
+    event,
 
-  return 0;
+    time:
+      Number.isFinite(
+        time
+      )
+        ? time
+        : null,
+
+    storeKey:
+      normalizeVenueName(
+        event.store_name
+      ),
+
+    latitude:
+      safeCoordinate(
+        event.latitude
+      ),
+
+    longitude:
+      safeCoordinate(
+        event.longitude
+      )
+  };
 }
 
-
-function sameVenue(
+function samePreparedVenue(
   a,
   b
 ) {
-  const aStore =
-    normalizeVenueName(
-      a.store_name
-    );
-
-  const bStore =
-    normalizeVenueName(
-      b.store_name
-    );
-
   if (
-    aStore &&
-    bStore &&
-    aStore === bStore
+    a.storeKey &&
+    b.storeKey &&
+    a.storeKey ===
+      b.storeKey
   ) {
     return true;
   }
 
-  const aLat =
-    safeCoordinate(
-      a.latitude
-    );
-
-  const aLon =
-    safeCoordinate(
-      a.longitude
-    );
-
-  const bLat =
-    safeCoordinate(
-      b.latitude
-    );
-
-  const bLon =
-    safeCoordinate(
-      b.longitude
-    );
-
   if (
-    aLat === null ||
-    aLon === null ||
-    bLat === null ||
-    bLon === null
+    a.latitude === null ||
+    a.longitude === null ||
+    b.latitude === null ||
+    b.longitude === null
   ) {
     return false;
   }
 
   return (
     distanceKm(
-      aLat,
-      aLon,
-      bLat,
-      bLon
+      a.latitude,
+      a.longitude,
+      b.latitude,
+      b.longitude
     )
     <= 0.35
   );
 }
 
-
-function likelySameEvent(
-  a,
-  b
+function getTimeBucket(
+  time
 ) {
-  if (
-    !a ||
-    !b
-  ) {
-    return false;
-  }
-
-  if (
-    a.source ===
-    b.source
-  ) {
-    return false;
-  }
-
-  if (
-    !sameVenue(
-      a,
-      b
-    )
-  ) {
-    return false;
-  }
-
-  const aTime =
-    Date.parse(
-      a.start_time
-    );
-
-  const bTime =
-    Date.parse(
-      b.start_time
-    );
-
-  if (
-    !Number.isFinite(
-      aTime
-    ) ||
-    !Number.isFinite(
-      bTime
-    )
-  ) {
-    return false;
-  }
-
-  const difference =
-    Math.abs(
-      aTime -
-      bTime
-    );
-
-  return (
-    difference <=
-    5 * 60 * 1000
+  return Math.floor(
+    time /
+    DEDUPE_TIME_WINDOW_MS
   );
 }
 
-
-function dedupeEvents(
-  events
+function addToBucket(
+  map,
+  bucket,
+  value
 ) {
-  const sorted =
-    [...events]
-      .sort(
-        (
-          a,
-          b
-        ) => {
-          const priority =
-            sourcePriority(
-              b
-            )
-            -
-            sourcePriority(
-              a
-            );
+  if (
+    !map.has(
+      bucket
+    )
+  ) {
+    map.set(
+      bucket,
+      []
+    );
+  }
 
-          if (
-            priority !== 0
-          ) {
-            return priority;
-          }
+  map
+    .get(
+      bucket
+    )
+    .push(
+      value
+    );
+}
 
-          const aTime =
-            Date.parse(
-              a.start_time
-            );
+function isLegacyDuplicateOfPlay(
+  legacy,
+  playByBucket
+) {
+  if (
+    legacy.time === null
+  ) {
+    return false;
+  }
 
-          const bTime =
-            Date.parse(
-              b.start_time
-            );
-
-          if (
-            !Number.isFinite(
-              aTime
-            )
-          ) {
-            return 1;
-          }
-
-          if (
-            !Number.isFinite(
-              bTime
-            )
-          ) {
-            return -1;
-          }
-
-          return (
-            aTime -
-            bTime
-          );
-        }
-      );
-
-  const kept =
-    [];
+  const bucket =
+    getTimeBucket(
+      legacy.time
+    );
 
   for (
-    const event of sorted
+    let offset = -1;
+    offset <= 1;
+    offset++
   ) {
-    const duplicate =
-      kept.some(
-        existing =>
-          likelySameEvent(
-            existing,
-            event
-          )
-      );
+    const candidates =
+      playByBucket.get(
+        bucket + offset
+      ) || [];
 
-    if (!duplicate) {
-      kept.push(
-        event
-      );
+    for (
+      const play of
+      candidates
+    ) {
+      if (
+        play.time === null
+      ) {
+        continue;
+      }
+
+      if (
+        Math.abs(
+          legacy.time -
+          play.time
+        )
+        >
+        DEDUPE_TIME_WINDOW_MS
+      ) {
+        continue;
+      }
+
+      if (
+        samePreparedVenue(
+          legacy,
+          play
+        )
+      ) {
+        return true;
+      }
     }
   }
 
-  kept.sort(
+  return false;
+}
+
+function sortEventsByStartTime(
+  events
+) {
+  events.sort(
     (
       a,
       b
@@ -1606,6 +1320,17 @@ function dedupeEvents(
         Date.parse(
           b.start_time
         );
+
+      if (
+        !Number.isFinite(
+          aTime
+        ) &&
+        !Number.isFinite(
+          bTime
+        )
+      ) {
+        return 0;
+      }
 
       if (
         !Number.isFinite(
@@ -1630,12 +1355,112 @@ function dedupeEvents(
     }
   );
 
-  return kept;
+  return events;
+}
+
+function dedupeEvents(
+  events
+) {
+  const playEvents =
+    [];
+
+  const legacyEvents =
+    [];
+
+  const otherEvents =
+    [];
+
+  for (
+    const event of
+    events
+  ) {
+    if (
+      event.source ===
+      "playriftbound"
+    ) {
+      playEvents.push(
+        prepareEventForDedupe(
+          event
+        )
+      );
+    }
+
+    else if (
+      event.source ===
+      "legacy-locator"
+    ) {
+      legacyEvents.push(
+        prepareEventForDedupe(
+          event
+        )
+      );
+    }
+
+    else {
+      otherEvents.push(
+        event
+      );
+    }
+  }
+
+  const playByBucket =
+    new Map();
+
+  for (
+    const play of
+    playEvents
+  ) {
+    if (
+      play.time === null
+    ) {
+      continue;
+    }
+
+    addToBucket(
+      playByBucket,
+      getTimeBucket(
+        play.time
+      ),
+      play
+    );
+  }
+
+  const kept =
+    playEvents.map(
+      item =>
+        item.event
+    );
+
+  for (
+    const legacy of
+    legacyEvents
+  ) {
+    if (
+      !isLegacyDuplicateOfPlay(
+        legacy,
+        playByBucket
+      )
+    ) {
+      kept.push(
+        legacy.event
+      );
+    }
+  }
+
+  kept.push(
+    ...otherEvents
+  );
+
+  return (
+    sortEventsByStartTime(
+      kept
+    )
+  );
 }
 
 
 /*
-  API HELPERS
+  API
 */
 
 function jsonResponse(
@@ -1656,7 +1481,6 @@ function jsonResponse(
     }
   );
 }
-
 
 async function getUpcomingEvents(
   env
@@ -1695,7 +1519,6 @@ async function getUpcomingEvents(
     )
   );
 }
-
 
 async function getCalendarEvents(
   env
@@ -1748,10 +1571,6 @@ async function getCalendarEvents(
 }
 
 
-/*
-  WORKER
-*/
-
 export default {
   async fetch(
     request,
@@ -1761,7 +1580,6 @@ export default {
       new URL(
         request.url
       );
-
 
     if (
       url.pathname ===
@@ -1798,7 +1616,6 @@ export default {
       }
     }
 
-
     if (
       url.pathname ===
       "/api/events"
@@ -1813,7 +1630,6 @@ export default {
       );
     }
 
-
     if (
       url.pathname ===
       "/api/calendar-events"
@@ -1827,7 +1643,6 @@ export default {
         events
       );
     }
-
 
     if (
       url.pathname ===
@@ -1961,7 +1776,6 @@ export default {
       );
     }
 
-
     return new Response(
       "Riftbound Events API is online!",
       {
@@ -1972,7 +1786,6 @@ export default {
       }
     );
   },
-
 
   async scheduled(
     controller,
