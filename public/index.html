@@ -3952,17 +3952,122 @@ function eventTypeClass(event) {
 
 /* FILTER OPTIONS */
 
+const storeDisplayNames =
+  new Map();
+
+
+function cleanStoreName(value) {
+  return String(value || "")
+    .trim()
+    .replace(
+      /\s+/g,
+      " "
+    );
+}
+
+
+function storeKey(value) {
+  return normalize(
+    cleanStoreName(value)
+  );
+}
+
+
+function preferredStoreName(
+  current,
+  candidate
+) {
+  const cleanCandidate =
+    cleanStoreName(
+      candidate
+    );
+
+  if (!current) {
+    return cleanCandidate;
+  }
+
+  const cleanCurrent =
+    cleanStoreName(
+      current
+    );
+
+  const currentIsAllCaps =
+    cleanCurrent ===
+    cleanCurrent.toLocaleUpperCase(
+      "el-GR"
+    );
+
+  const candidateIsAllCaps =
+    cleanCandidate ===
+    cleanCandidate.toLocaleUpperCase(
+      "el-GR"
+    );
+
+  if (
+    currentIsAllCaps &&
+    !candidateIsAllCaps
+  ) {
+    return cleanCandidate;
+  }
+
+  return cleanCurrent;
+}
+
+
+function displayStoreName(value) {
+  const key =
+    storeKey(value);
+
+  if (!key) {
+    return "";
+  }
+
+  return (
+    storeDisplayNames.get(key) ||
+    cleanStoreName(value)
+  );
+}
+
+
 function populatePageData(events) {
-  const stores = [
-    ...new Set(
-      events
-        .map(
-          event =>
-            event.store_name
+  storeDisplayNames.clear();
+
+  events.forEach(
+    event => {
+      const cleanName =
+        cleanStoreName(
+          event.store_name
+        );
+
+      const key =
+        storeKey(
+          cleanName
+        );
+
+      if (!key) {
+        return;
+      }
+
+      storeDisplayNames.set(
+        key,
+        preferredStoreName(
+          storeDisplayNames.get(key),
+          cleanName
         )
-        .filter(Boolean)
-    )
-  ];
+      );
+    }
+  );
+
+  const stores = [
+    ...storeDisplayNames
+      .entries()
+  ]
+  .map(
+    ([key,name]) => ({
+      key,
+      name
+    })
+  );
 
   const cities = [
     ...new Set(
@@ -4005,6 +4110,12 @@ function populatePageData(events) {
       "city-filter"
     );
 
+  while (
+    cityFilter.options.length > 1
+  ) {
+    cityFilter.remove(1);
+  }
+
   cities
     .sort(
       (a,b) =>
@@ -4038,11 +4149,17 @@ function populatePageData(events) {
       "store-filter"
     );
 
+  while (
+    storeFilter.options.length > 1
+  ) {
+    storeFilter.remove(1);
+  }
+
   stores
     .sort(
       (a,b) =>
-        a.localeCompare(
-          b,
+        a.name.localeCompare(
+          b.name,
           "el"
         )
     )
@@ -4054,10 +4171,10 @@ function populatePageData(events) {
           );
 
         option.value =
-          store;
+          store.key;
 
         option.textContent =
-          store;
+          store.name;
 
         storeFilter.appendChild(
           option
@@ -4110,8 +4227,9 @@ function eventMatchesFilters(
     &&
     (
       !store ||
-      event.store_name ===
-        store
+      storeKey(
+        event.store_name
+      ) === store
     )
     &&
     (
@@ -4258,7 +4376,9 @@ function createEventCard(event) {
     "Ελλάδα";
 
   const store =
-    event.store_name ||
+    displayStoreName(
+      event.store_name
+    ) ||
     "Riftbound Event";
 
   const url =
