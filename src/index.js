@@ -10,71 +10,240 @@ const PLAYRIFTBOUND_RADIUS_METERS = 32187;
 const PLAYRIFTBOUND_PAGE_SIZE = 20;
 const PLAYRIFTBOUND_MAX_PAGES_PER_AREA = 20;
 const PLAYRIFTBOUND_MAX_TOTAL_REQUESTS = 45;
-const PLAYRIFTBOUND_OPERATION = "CompeteTournamentSearch";
+const PLAYRIFTBOUND_STALE_AFTER_MINUTES = 75;
+
+const PLAYRIFTBOUND_OPERATION =
+  "CompeteTournamentSearch";
+
 const PLAYRIFTBOUND_QUERY_HASH =
   "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
 
-const PLAYRIFTBOUND_SEARCH_AREAS = [
-  { name: "Athens", latitude: 37.9842, longitude: 23.7353 },
-  { name: "Chalkida", latitude: 38.4636, longitude: 23.5994 },
-  { name: "Corinth", latitude: 37.9386, longitude: 22.9322 },
-  { name: "Patras", latitude: 38.2466, longitude: 21.7346 },
-  { name: "Kalamata", latitude: 37.0389, longitude: 22.1142 },
-  { name: "Tripoli", latitude: 37.5101, longitude: 22.3726 },
-  { name: "Lamia", latitude: 38.8993, longitude: 22.4332 },
-  { name: "Volos", latitude: 39.3610, longitude: 22.9426 },
-  { name: "Larisa", latitude: 39.6390, longitude: 22.4191 },
-  { name: "Trikala", latitude: 39.5557, longitude: 21.7679 },
-  { name: "Ioannina", latitude: 39.6650, longitude: 20.8537 },
-  { name: "Agrinio", latitude: 38.6214, longitude: 21.4078 },
-  { name: "Thessaloniki", latitude: 40.6401, longitude: 22.9444 },
-  { name: "Skydra", latitude: 40.7680, longitude: 22.1514 },
-  { name: "Kozani", latitude: 40.3007, longitude: 21.7889 },
-  { name: "Serres", latitude: 41.0909, longitude: 23.5413 },
-  { name: "Kavala", latitude: 40.9396, longitude: 24.4069 },
-  { name: "Xanthi", latitude: 41.1349, longitude: 24.8880 },
-  { name: "Komotini", latitude: 41.1192, longitude: 25.4054 },
-  { name: "Alexandroupoli", latitude: 40.8457, longitude: 25.8739 },
-  { name: "Corfu", latitude: 39.6243, longitude: 19.9217 },
-  { name: "Zakynthos", latitude: 37.7870, longitude: 20.8999 },
-  { name: "Heraklion", latitude: 35.3387, longitude: 25.1442 },
-  { name: "Chania", latitude: 35.5138, longitude: 24.0180 },
-  { name: "Rhodes", latitude: 36.4341, longitude: 28.2176 },
-  { name: "Kos", latitude: 36.8937, longitude: 27.2877 },
-  { name: "Mytilene", latitude: 39.1079, longitude: 26.5553 },
-  { name: "Chios", latitude: 38.3688, longitude: 26.1358 },
-  { name: "Samos", latitude: 37.7548, longitude: 26.9770 },
-  { name: "Syros", latitude: 37.4447, longitude: 24.9429 }
+
+/*
+  GROUP A runs at :00 and :30.
+  It also runs the Legacy Locator.
+*/
+
+const PLAYRIFTBOUND_GROUP_A = [
+  {
+    name: "Athens",
+    latitude: 37.9842,
+    longitude: 23.7353
+  },
+  {
+    name: "Chalkida",
+    latitude: 38.4636,
+    longitude: 23.5994
+  },
+  {
+    name: "Corinth",
+    latitude: 37.9386,
+    longitude: 22.9322
+  },
+  {
+    name: "Patras",
+    latitude: 38.2466,
+    longitude: 21.7346
+  },
+  {
+    name: "Kalamata",
+    latitude: 37.0389,
+    longitude: 22.1142
+  },
+  {
+    name: "Tripoli",
+    latitude: 37.5101,
+    longitude: 22.3726
+  },
+  {
+    name: "Lamia",
+    latitude: 38.8993,
+    longitude: 22.4332
+  },
+  {
+    name: "Volos",
+    latitude: 39.3610,
+    longitude: 22.9426
+  },
+  {
+    name: "Larisa",
+    latitude: 39.6390,
+    longitude: 22.4191
+  },
+  {
+    name: "Trikala",
+    latitude: 39.5557,
+    longitude: 21.7679
+  },
+  {
+    name: "Ioannina",
+    latitude: 39.6650,
+    longitude: 20.8537
+  },
+  {
+    name: "Agrinio",
+    latitude: 38.6214,
+    longitude: 21.4078
+  },
+  {
+    name: "Corfu",
+    latitude: 39.6243,
+    longitude: 19.9217
+  },
+  {
+    name: "Zakynthos",
+    latitude: 37.7870,
+    longitude: 20.8999
+  },
+  {
+    name: "Syros",
+    latitude: 37.4447,
+    longitude: 24.9429
+  }
 ];
+
+
+/*
+  GROUP B runs at :15 and :45.
+*/
+
+const PLAYRIFTBOUND_GROUP_B = [
+  {
+    name: "Thessaloniki",
+    latitude: 40.6401,
+    longitude: 22.9444
+  },
+  {
+    name: "Skydra",
+    latitude: 40.7680,
+    longitude: 22.1514
+  },
+  {
+    name: "Kozani",
+    latitude: 40.3007,
+    longitude: 21.7889
+  },
+  {
+    name: "Serres",
+    latitude: 41.0909,
+    longitude: 23.5413
+  },
+  {
+    name: "Kavala",
+    latitude: 40.9396,
+    longitude: 24.4069
+  },
+  {
+    name: "Xanthi",
+    latitude: 41.1349,
+    longitude: 24.8880
+  },
+  {
+    name: "Komotini",
+    latitude: 41.1192,
+    longitude: 25.4054
+  },
+  {
+    name: "Alexandroupoli",
+    latitude: 40.8457,
+    longitude: 25.8739
+  },
+  {
+    name: "Heraklion",
+    latitude: 35.3387,
+    longitude: 25.1442
+  },
+  {
+    name: "Chania",
+    latitude: 35.5138,
+    longitude: 24.0180
+  },
+  {
+    name: "Rhodes",
+    latitude: 36.4341,
+    longitude: 28.2176
+  },
+  {
+    name: "Kos",
+    latitude: 36.8937,
+    longitude: 27.2877
+  },
+  {
+    name: "Mytilene",
+    latitude: 39.1079,
+    longitude: 26.5553
+  },
+  {
+    name: "Chios",
+    latitude: 38.3688,
+    longitude: 26.1358
+  },
+  {
+    name: "Samos",
+    latitude: 37.7548,
+    longitude: 26.9770
+  }
+];
+
+
+/* -------------------- HELPERS -------------------- */
 
 function normalizeText(value) {
   return String(value || "")
     .trim()
     .toLocaleLowerCase("el-GR")
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
 }
+
 
 function normalizeVenueName(value) {
-  return normalizeText(value).replace(/[^\p{L}\p{N}]+/gu, "");
+  return normalizeText(value)
+    .replace(
+      /[^\p{L}\p{N}]+/gu,
+      ""
+    );
 }
 
-function safeCoordinate(value) {
-  if (value === null || value === undefined || value === "") return null;
 
-  const number = Number(value);
+function safeCoordinate(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const number =
+    Number(value);
 
   return Number.isFinite(number)
     ? number
     : null;
 }
 
+
 function degreesToRadians(value) {
-  return value * Math.PI / 180;
+  return (
+    value *
+    Math.PI /
+    180
+  );
 }
 
-function distanceKm(lat1, lon1, lat2, lon2) {
-  const earthRadiusKm = 6371;
+
+function distanceKm(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
+  const radius =
+    6371;
 
   const dLat =
     degreesToRadians(
@@ -86,41 +255,67 @@ function distanceKm(lat1, lon1, lat2, lon2) {
       lon2 - lon1
     );
 
-  const rLat1 =
-    degreesToRadians(
-      lat1
-    );
-
-  const rLat2 =
-    degreesToRadians(
-      lat2
-    );
-
   const a =
-    Math.sin(dLat / 2) ** 2
+    Math.sin(
+      dLat / 2
+    ) ** 2
     +
-    Math.cos(rLat1)
+    Math.cos(
+      degreesToRadians(
+        lat1
+      )
+    )
     *
-    Math.cos(rLat2)
+    Math.cos(
+      degreesToRadians(
+        lat2
+      )
+    )
     *
-    Math.sin(dLon / 2) ** 2;
+    Math.sin(
+      dLon / 2
+    ) ** 2;
 
-  return (
-    earthRadiusKm
-    *
-    2
-    *
+  const c =
+    2 *
     Math.atan2(
       Math.sqrt(a),
       Math.sqrt(1 - a)
-    )
+    );
+
+  return (
+    radius *
+    c
   );
 }
 
 
-/*
-  LEGACY LOCATOR
-*/
+function jsonResponse(
+  data,
+  cacheControl =
+    "public, max-age=300",
+  status =
+    200
+) {
+  return Response.json(
+    data,
+    {
+      status,
+
+      headers: {
+        "Access-Control-Allow-Origin":
+          "*",
+
+        "Cache-Control":
+          cacheControl
+      }
+    }
+  );
+}
+
+
+
+/* -------------------- LEGACY LOCATOR -------------------- */
 
 async function fetchAllLegacyEvents() {
   const startDate =
@@ -236,12 +431,15 @@ async function fetchAllLegacyEvents() {
 
   return {
     total,
+
     pagesChecked:
       page,
+
     events:
       allEvents
   };
 }
+
 
 function isGreekLegacyEvent(event) {
   const country =
@@ -268,6 +466,7 @@ function isGreekLegacyEvent(event) {
     )
   );
 }
+
 
 function normalizeLegacyEvent(event) {
   return {
@@ -319,16 +518,15 @@ function normalizeLegacyEvent(event) {
 }
 
 
-/*
-  PLAYRIFTBOUND
-*/
+
+/* -------------------- PLAYRIFTBOUND -------------------- */
 
 function playRiftboundEventType(value) {
   const type =
     String(
       value || ""
     )
-      .toUpperCase();
+    .toUpperCase();
 
   const types = {
     NEXUS_NIGHT:
@@ -359,6 +557,7 @@ function playRiftboundEventType(value) {
     null
   );
 }
+
 
 function buildPlayRiftboundURL(
   area,
@@ -435,6 +634,7 @@ function buildPlayRiftboundURL(
     `${PLAYRIFTBOUND_GQL}?${params.toString()}`
   );
 }
+
 
 async function fetchPlayRiftboundPage(
   area,
@@ -553,6 +753,7 @@ async function fetchPlayRiftboundPage(
   };
 }
 
+
 async function fetchPlayRiftboundArea(
   area,
   requestCounter
@@ -654,7 +855,10 @@ async function fetchPlayRiftboundArea(
   };
 }
 
-async function fetchAllPlayRiftboundEvents() {
+
+async function fetchAllPlayRiftboundEvents(
+  searchAreas
+) {
   const allEventsById =
     new Map();
 
@@ -668,7 +872,7 @@ async function fetchAllPlayRiftboundEvents() {
 
   for (
     const area of
-    PLAYRIFTBOUND_SEARCH_AREAS
+    searchAreas
   ) {
     const result =
       await fetchPlayRiftboundArea(
@@ -712,7 +916,7 @@ async function fetchAllPlayRiftboundEvents() {
       requestCounter.count,
 
     searchAreas:
-      PLAYRIFTBOUND_SEARCH_AREAS.length,
+      searchAreas.length,
 
     areaResults,
 
@@ -722,6 +926,7 @@ async function fetchAllPlayRiftboundEvents() {
       ]
   };
 }
+
 
 function isGreekPlayRiftboundEvent(
   node
@@ -743,6 +948,7 @@ function isGreekPlayRiftboundEvent(
     )
   );
 }
+
 
 function normalizePlayRiftboundEvent(
   node
@@ -815,121 +1021,121 @@ function normalizePlayRiftboundEvent(
 }
 
 
-/*
-  D1 SYNC
-*/
 
-async function syncSourceEvents(
+/* -------------------- D1 UPSERT -------------------- */
+
+function buildUpsertStatement(
+  env,
+  event,
+  source,
+  syncStamp
+) {
+  return env.DB.prepare(`
+    INSERT INTO events (
+      external_id,
+      title,
+      store_name,
+      city,
+      address,
+      event_type,
+      start_time,
+      event_url,
+      latitude,
+      longitude,
+      status,
+      source,
+      last_seen_at,
+      updated_at
+    )
+
+    VALUES (
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      ?,
+      'active',
+      ?,
+      ?,
+      CURRENT_TIMESTAMP
+    )
+
+    ON CONFLICT(external_id)
+
+    DO UPDATE SET
+      title =
+        excluded.title,
+
+      store_name =
+        excluded.store_name,
+
+      city =
+        excluded.city,
+
+      address =
+        excluded.address,
+
+      event_type =
+        excluded.event_type,
+
+      start_time =
+        excluded.start_time,
+
+      event_url =
+        excluded.event_url,
+
+      latitude =
+        excluded.latitude,
+
+      longitude =
+        excluded.longitude,
+
+      status =
+        'active',
+
+      source =
+        excluded.source,
+
+      last_seen_at =
+        excluded.last_seen_at,
+
+      updated_at =
+        CURRENT_TIMESTAMP
+  `)
+  .bind(
+    event.external_id,
+    event.title,
+    event.store_name,
+    event.city,
+    event.address,
+    event.event_type,
+    event.start_time,
+    event.event_url,
+    event.latitude,
+    event.longitude,
+    source,
+    syncStamp
+  );
+}
+
+
+async function batchUpsertEvents(
   env,
   source,
-  events
+  events,
+  syncStamp
 ) {
-  if (
-    !Array.isArray(
-      events
-    ) ||
-    events.length === 0
-  ) {
-    throw new Error(
-      `${source} returned zero Greek events. Refusing to mark existing events inactive.`
-    );
-  }
-
-  const syncStamp =
-    new Date()
-      .toISOString();
-
   const statements =
     events.map(
       event =>
-        env.DB.prepare(`
-          INSERT INTO events (
-            external_id,
-            title,
-            store_name,
-            city,
-            address,
-            event_type,
-            start_time,
-            event_url,
-            latitude,
-            longitude,
-            status,
-            source,
-            last_seen_at,
-            updated_at
-          )
-
-          VALUES (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            'active',
-            ?,
-            ?,
-            CURRENT_TIMESTAMP
-          )
-
-          ON CONFLICT(external_id)
-
-          DO UPDATE SET
-            title =
-              excluded.title,
-
-            store_name =
-              excluded.store_name,
-
-            city =
-              excluded.city,
-
-            address =
-              excluded.address,
-
-            event_type =
-              excluded.event_type,
-
-            start_time =
-              excluded.start_time,
-
-            event_url =
-              excluded.event_url,
-
-            latitude =
-              excluded.latitude,
-
-            longitude =
-              excluded.longitude,
-
-            status =
-              'active',
-
-            source =
-              excluded.source,
-
-            last_seen_at =
-              excluded.last_seen_at,
-
-            updated_at =
-              CURRENT_TIMESTAMP
-        `)
-        .bind(
-          event.external_id,
-          event.title,
-          event.store_name,
-          event.city,
-          event.address,
-          event.event_type,
-          event.start_time,
-          event.event_url,
-          event.latitude,
-          event.longitude,
+        buildUpsertStatement(
+          env,
+          event,
           source,
           syncStamp
         )
@@ -950,6 +1156,41 @@ async function syncSourceEvents(
       )
     );
   }
+}
+
+
+/*
+  Full-source sync.
+  Used by Legacy, because Legacy is still
+  downloaded completely in one run.
+*/
+
+async function syncFullSourceEvents(
+  env,
+  source,
+  events
+) {
+  if (
+    !Array.isArray(
+      events
+    ) ||
+    events.length === 0
+  ) {
+    throw new Error(
+      `${source} returned zero Greek events. Refusing to mark existing events inactive.`
+    );
+  }
+
+  const syncStamp =
+    new Date()
+      .toISOString();
+
+  await batchUpsertEvents(
+    env,
+    source,
+    events,
+    syncStamp
+  );
 
   await env.DB.prepare(`
     UPDATE events
@@ -965,16 +1206,97 @@ async function syncSourceEvents(
         OR last_seen_at <> ?
       )
   `)
-    .bind(
-      source,
-      syncStamp
-    )
-    .run();
+  .bind(
+    source,
+    syncStamp
+  )
+  .run();
 
   return (
     events.length
   );
 }
+
+
+/*
+  Partial PlayRiftbound sync.
+
+  Only half of Greece is searched each run.
+  Therefore we do NOT immediately deactivate
+  rows that were not seen in this run.
+
+  Every group is refreshed every 30 minutes.
+  A row becomes inactive only if it has not
+  been seen for 75 minutes.
+*/
+
+async function syncPlayRiftboundPartialEvents(
+  env,
+  events
+) {
+  if (
+    !Array.isArray(
+      events
+    ) ||
+    events.length === 0
+  ) {
+    throw new Error(
+      "playriftbound returned zero Greek events for this group. Refusing to update stale status."
+    );
+  }
+
+  const syncStamp =
+    new Date()
+      .toISOString();
+
+  await batchUpsertEvents(
+    env,
+    "playriftbound",
+    events,
+    syncStamp
+  );
+
+  const staleBefore =
+    new Date(
+      Date.now() -
+      PLAYRIFTBOUND_STALE_AFTER_MINUTES *
+      60 *
+      1000
+    )
+    .toISOString();
+
+  await env.DB.prepare(`
+    UPDATE events
+
+    SET
+      status = 'inactive',
+      updated_at = CURRENT_TIMESTAMP
+
+    WHERE
+      source = 'playriftbound'
+      AND status = 'active'
+      AND (
+        last_seen_at IS NULL
+        OR datetime(last_seen_at) < datetime(?)
+      )
+  `)
+  .bind(
+    staleBefore
+  )
+  .run();
+
+  return {
+    events_synced:
+      events.length,
+
+    stale_before:
+      staleBefore
+  };
+}
+
+
+
+/* -------------------- SOURCE RUNNERS -------------------- */
 
 async function syncLegacySource(
   env
@@ -995,7 +1317,7 @@ async function syncLegacySource(
       );
 
   const synced =
-    await syncSourceEvents(
+    await syncFullSourceEvents(
       env,
       "legacy-locator",
       normalized
@@ -1019,11 +1341,16 @@ async function syncLegacySource(
   };
 }
 
+
 async function syncPlayRiftboundSource(
-  env
+  env,
+  searchAreas,
+  groupName
 ) {
   const result =
-    await fetchAllPlayRiftboundEvents();
+    await fetchAllPlayRiftboundEvents(
+      searchAreas
+    );
 
   const greekEvents =
     result.events
@@ -1037,16 +1364,18 @@ async function syncPlayRiftboundSource(
         normalizePlayRiftboundEvent
       );
 
-  const synced =
-    await syncSourceEvents(
+  const syncResult =
+    await syncPlayRiftboundPartialEvents(
       env,
-      "playriftbound",
       normalized
     );
 
   return {
     source:
       "playriftbound",
+
+    group:
+      groupName,
 
     search_areas:
       result.searchAreas,
@@ -1061,15 +1390,114 @@ async function syncPlayRiftboundSource(
       greekEvents.length,
 
     events_synced:
-      synced,
+      syncResult.events_synced,
+
+    stale_before:
+      syncResult.stale_before,
 
     areas:
       result.areaResults
   };
 }
 
+
+
+/* -------------------- 15-MINUTE ROTATION -------------------- */
+
+function getSyncPlan(
+  timestamp = Date.now()
+) {
+  const minute =
+    new Date(
+      timestamp
+    )
+    .getUTCMinutes();
+
+  /*
+    :00 / :30 = Group A
+    :15 / :45 = Group B
+  */
+
+  const groupIndex =
+    Math.floor(
+      minute / 15
+    ) % 2;
+
+  if (
+    groupIndex === 0
+  ) {
+    return {
+      groupName:
+        "A",
+
+      searchAreas:
+        PLAYRIFTBOUND_GROUP_A,
+
+      includeLegacy:
+        true
+    };
+  }
+
+  return {
+    groupName:
+      "B",
+
+    searchAreas:
+      PLAYRIFTBOUND_GROUP_B,
+
+    includeLegacy:
+      false
+  };
+}
+
+
+function getRequestedSyncPlan(
+  group
+) {
+  const normalized =
+    String(
+      group || ""
+    )
+    .trim()
+    .toUpperCase();
+
+  if (
+    normalized === "A"
+  ) {
+    return {
+      groupName:
+        "A",
+
+      searchAreas:
+        PLAYRIFTBOUND_GROUP_A,
+
+      includeLegacy:
+        true
+    };
+  }
+
+  if (
+    normalized === "B"
+  ) {
+    return {
+      groupName:
+        "B",
+
+      searchAreas:
+        PLAYRIFTBOUND_GROUP_B,
+
+      includeLegacy:
+        false
+    };
+  }
+
+  return null;
+}
+
+
 async function runSync(
-  env
+  env,
+  plan
 ) {
   let legacyResult =
     null;
@@ -1080,22 +1508,28 @@ async function runSync(
   const errors =
     {};
 
-  try {
-    legacyResult =
-      await syncLegacySource(
-        env
-      );
-  }
+  if (
+    plan.includeLegacy
+  ) {
+    try {
+      legacyResult =
+        await syncLegacySource(
+          env
+        );
+    }
 
-  catch (error) {
-    errors.legacy_locator =
-      String(error);
+    catch (error) {
+      errors.legacy_locator =
+        String(error);
+    }
   }
 
   try {
     playRiftboundResult =
       await syncPlayRiftboundSource(
-        env
+        env,
+        plan.searchAreas,
+        plan.groupName
       );
   }
 
@@ -1109,11 +1543,14 @@ async function runSync(
     !playRiftboundResult
   ) {
     throw new Error(
-      `All event sources failed: ${JSON.stringify(errors)}`
+      `All scheduled sources failed: ${JSON.stringify(errors)}`
     );
   }
 
   return {
+    sync_group:
+      plan.groupName,
+
     legacy_locator:
       legacyResult,
 
@@ -1130,16 +1567,12 @@ async function runSync(
 }
 
 
-/*
-  FAST DEDUPE
 
-  PlayRiftbound έχει προτεραιότητα.
-  Δεν συγκρίνουμε πλέον κάθε event με όλα
-  τα υπόλοιπα, για να μη χτυπάει το CPU limit.
-*/
+/* -------------------- FAST READ DEDUPE -------------------- */
 
 const DEDUPE_TIME_WINDOW_MS =
   5 * 60 * 1000;
+
 
 function prepareEventForDedupe(
   event
@@ -1176,6 +1609,7 @@ function prepareEventForDedupe(
   };
 }
 
+
 function samePreparedVenue(
   a,
   b
@@ -1209,6 +1643,7 @@ function samePreparedVenue(
   );
 }
 
+
 function getTimeBucket(
   time
 ) {
@@ -1218,30 +1653,6 @@ function getTimeBucket(
   );
 }
 
-function addToBucket(
-  map,
-  bucket,
-  value
-) {
-  if (
-    !map.has(
-      bucket
-    )
-  ) {
-    map.set(
-      bucket,
-      []
-    );
-  }
-
-  map
-    .get(
-      bucket
-    )
-    .push(
-      value
-    );
-}
 
 function isLegacyDuplicateOfPlay(
   legacy,
@@ -1303,6 +1714,7 @@ function isLegacyDuplicateOfPlay(
   return false;
 }
 
+
 function sortEventsByStartTime(
   events
 ) {
@@ -1357,6 +1769,7 @@ function sortEventsByStartTime(
 
   return events;
 }
+
 
 function dedupeEvents(
   events
@@ -1416,13 +1829,29 @@ function dedupeEvents(
       continue;
     }
 
-    addToBucket(
-      playByBucket,
+    const bucket =
       getTimeBucket(
         play.time
-      ),
-      play
-    );
+      );
+
+    if (
+      !playByBucket.has(
+        bucket
+      )
+    ) {
+      playByBucket.set(
+        bucket,
+        []
+      );
+    }
+
+    playByBucket
+      .get(
+        bucket
+      )
+      .push(
+        play
+      );
   }
 
   const kept =
@@ -1459,28 +1888,8 @@ function dedupeEvents(
 }
 
 
-/*
-  API
-*/
 
-function jsonResponse(
-  data,
-  cacheControl =
-    "public, max-age=300"
-) {
-  return Response.json(
-    data,
-    {
-      headers: {
-        "Access-Control-Allow-Origin":
-          "*",
-
-        "Cache-Control":
-          cacheControl
-      }
-    }
-  );
-}
+/* -------------------- READ APIs -------------------- */
 
 async function getUpcomingEvents(
   env
@@ -1519,6 +1928,7 @@ async function getUpcomingEvents(
     )
   );
 }
+
 
 async function getCalendarEvents(
   env
@@ -1571,6 +1981,143 @@ async function getCalendarEvents(
 }
 
 
+async function getStatus(
+  env
+) {
+  const latest =
+    await env.DB.prepare(`
+      SELECT
+        last_seen_at
+
+      FROM events
+
+      WHERE
+        source IN (
+          'legacy-locator',
+          'playriftbound'
+        )
+        AND last_seen_at
+          IS NOT NULL
+
+      ORDER BY
+        datetime(last_seen_at)
+        DESC
+
+      LIMIT 1
+    `)
+    .first();
+
+
+  const {
+    results:
+      activeRows
+  } =
+    await env.DB.prepare(`
+      SELECT
+        external_id,
+        title,
+        store_name,
+        city,
+        address,
+        event_type,
+        start_time,
+        event_url,
+        latitude,
+        longitude,
+        status,
+        source
+
+      FROM events
+
+      WHERE
+        status = 'active'
+    `)
+    .all();
+
+
+  const {
+    results:
+      sourceRows
+  } =
+    await env.DB.prepare(`
+      SELECT
+        source,
+
+        MAX(
+          last_seen_at
+        )
+          AS last_sync,
+
+        SUM(
+          CASE
+            WHEN status =
+              'active'
+            THEN 1
+            ELSE 0
+          END
+        )
+          AS active_events
+
+      FROM events
+
+      WHERE
+        source IN (
+          'legacy-locator',
+          'playriftbound'
+        )
+
+      GROUP BY
+        source
+    `)
+    .all();
+
+
+  const sources =
+    {};
+
+
+  for (
+    const row of
+    sourceRows
+  ) {
+    sources[
+      row.source
+    ] = {
+      last_sync:
+        row.last_sync ||
+        null,
+
+      active_events:
+        Number(
+          row.active_events ||
+          0
+        )
+    };
+  }
+
+
+  return {
+    online:
+      true,
+
+    last_successful_sync:
+      latest
+        ?.last_seen_at ||
+      null,
+
+    active_events:
+      dedupeEvents(
+        activeRows
+      ).length,
+
+    sources
+  };
+}
+
+
+
+/* -------------------- WORKER -------------------- */
+
 export default {
   async fetch(
     request,
@@ -1581,15 +2128,47 @@ export default {
         request.url
       );
 
+
     if (
       url.pathname ===
       "/api/sync-test"
     ) {
       try {
+        const requestedGroup =
+          url.searchParams.get(
+            "group"
+          );
+
+
+        const plan =
+          requestedGroup
+            ? getRequestedSyncPlan(
+                requestedGroup
+              )
+            : getSyncPlan();
+
+
+        if (!plan) {
+          return jsonResponse(
+            {
+              success:
+                false,
+
+              error:
+                "group must be A or B"
+            },
+            "no-store",
+            400
+          );
+        }
+
+
         const result =
           await runSync(
-            env
+            env,
+            plan
           );
+
 
         return jsonResponse(
           {
@@ -1611,10 +2190,12 @@ export default {
             error:
               String(error)
           },
-          "no-store"
+          "no-store",
+          500
         );
       }
     }
+
 
     if (
       url.pathname ===
@@ -1630,6 +2211,7 @@ export default {
       );
     }
 
+
     if (
       url.pathname ===
       "/api/calendar-events"
@@ -1644,137 +2226,22 @@ export default {
       );
     }
 
+
     if (
       url.pathname ===
       "/api/status"
     ) {
-      const latest =
-        await env.DB.prepare(`
-          SELECT
-            last_seen_at
-
-          FROM events
-
-          WHERE
-            source IN (
-              'legacy-locator',
-              'playriftbound'
-            )
-            AND last_seen_at
-              IS NOT NULL
-
-          ORDER BY
-            datetime(last_seen_at)
-            DESC
-
-          LIMIT 1
-        `)
-        .first();
-
-      const {
-        results:
-          activeRows
-      } =
-        await env.DB.prepare(`
-          SELECT
-            external_id,
-            title,
-            store_name,
-            city,
-            address,
-            event_type,
-            start_time,
-            event_url,
-            latitude,
-            longitude,
-            status,
-            source
-
-          FROM events
-
-          WHERE
-            status = 'active'
-        `)
-        .all();
-
-      const {
-        results:
-          sourceRows
-      } =
-        await env.DB.prepare(`
-          SELECT
-            source,
-
-            MAX(
-              last_seen_at
-            )
-              AS last_sync,
-
-            SUM(
-              CASE
-                WHEN status =
-                  'active'
-                THEN 1
-                ELSE 0
-              END
-            )
-              AS active_events
-
-          FROM events
-
-          WHERE
-            source IN (
-              'legacy-locator',
-              'playriftbound'
-            )
-
-          GROUP BY
-            source
-        `)
-        .all();
-
-      const sources =
-        {};
-
-      for (
-        const row of
-        sourceRows
-      ) {
-        sources[
-          row.source
-        ] = {
-          last_sync:
-            row.last_sync ||
-            null,
-
-          active_events:
-            Number(
-              row.active_events ||
-              0
-            )
-        };
-      }
+      const status =
+        await getStatus(
+          env
+        );
 
       return jsonResponse(
-        {
-          online:
-            true,
-
-          last_successful_sync:
-            latest
-              ?.last_seen_at ||
-            null,
-
-          active_events:
-            dedupeEvents(
-              activeRows
-            ).length,
-
-          sources
-        },
+        status,
         "no-store"
       );
     }
+
 
     return new Response(
       "Riftbound Events API is online!",
@@ -1787,14 +2254,24 @@ export default {
     );
   },
 
+
   async scheduled(
     controller,
     env,
     ctx
   ) {
+    const plan =
+      getSyncPlan(
+        controller
+          ?.scheduledTime ||
+        Date.now()
+      );
+
+
     ctx.waitUntil(
       runSync(
-        env
+        env,
+        plan
       )
     );
   }
