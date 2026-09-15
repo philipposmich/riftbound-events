@@ -4,10 +4,10 @@
   "compatibility_date": "2026-09-09",
 
   "triggers": {
-    "crons": [
-      "0,30 * * * *"
-    ]
-  },
+  "crons": [
+    "0,15,30,45 * * * *"
+  ]
+},
 
   "d1_databases": [
     {
