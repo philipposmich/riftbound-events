@@ -9,19 +9,12 @@ const PLAYRIFTBOUND_GQL =
   LEGACY LOCATOR
 */
 
-const LEGACY_PAGE_SIZE = 250;
+const LEGACY_PAGE_SIZE =
+  250;
 
 
 /*
   PLAYRIFTBOUND
-
-  600 km από Αθήνα καλύπτουν πρακτικά
-  όλη την Ελλάδα.
-
-  Το captured request του site χρησιμοποιούσε
-  32.187 m. Θα επιβεβαιώσουμε με το πρώτο
-  sync-test ότι το API δέχεται τη μεγαλύτερη
-  ακτίνα.
 */
 
 const PLAYRIFTBOUND_CENTER = {
@@ -45,7 +38,6 @@ const PLAYRIFTBOUND_QUERY_HASH =
   "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
 
 
-
 /*
   GENERAL HELPERS
 */
@@ -62,7 +54,6 @@ function normalizeText(value) {
 }
 
 
-
 function normalizeVenueName(value) {
   return normalizeText(value)
     .replace(
@@ -70,7 +61,6 @@ function normalizeVenueName(value) {
       ""
     );
 }
-
 
 
 function safeCoordinate(value) {
@@ -91,7 +81,6 @@ function safeCoordinate(value) {
 }
 
 
-
 function degreesToRadians(value) {
   return (
     value *
@@ -99,7 +88,6 @@ function degreesToRadians(value) {
     180
   );
 }
-
 
 
 function distanceKm(
@@ -122,17 +110,25 @@ function distanceKm(
     );
 
   const a =
-    Math.sin(dLat / 2) ** 2
+    Math.sin(
+      dLat / 2
+    ) ** 2
     +
     Math.cos(
-      degreesToRadians(lat1)
+      degreesToRadians(
+        lat1
+      )
     )
     *
     Math.cos(
-      degreesToRadians(lat2)
+      degreesToRadians(
+        lat2
+      )
     )
     *
-    Math.sin(dLon / 2) ** 2;
+    Math.sin(
+      dLon / 2
+    ) ** 2;
 
   const c =
     2 *
@@ -141,9 +137,11 @@ function distanceKm(
       Math.sqrt(1 - a)
     );
 
-  return radius * c;
+  return (
+    radius *
+    c
+  );
 }
-
 
 
 /*
@@ -161,12 +159,14 @@ async function fetchAllLegacyEvents() {
     endDate.getDate() + 90
   );
 
+  let page =
+    1;
 
-  let page = 1;
-  let total = null;
+  let total =
+    null;
 
-  const allEvents = [];
-
+  const allEvents =
+    [];
 
   while (true) {
     const params =
@@ -204,7 +204,6 @@ async function fetchAllLegacyEvents() {
           )
       });
 
-
     const response =
       await fetch(
         `${LEGACY_LOCATOR_API}/events/?${params.toString()}`,
@@ -216,17 +215,14 @@ async function fetchAllLegacyEvents() {
         }
       );
 
-
     if (!response.ok) {
       throw new Error(
         `Legacy Locator returned HTTP ${response.status} on page ${page}`
       );
     }
 
-
     const data =
       await response.json();
-
 
     const pageEvents =
       Array.isArray(
@@ -235,7 +231,6 @@ async function fetchAllLegacyEvents() {
         ? data.results
         : [];
 
-
     if (total === null) {
       total =
         Number(
@@ -243,11 +238,9 @@ async function fetchAllLegacyEvents() {
         );
     }
 
-
     allEvents.push(
       ...pageEvents
     );
-
 
     if (
       pageEvents.length === 0 ||
@@ -258,9 +251,7 @@ async function fetchAllLegacyEvents() {
       break;
     }
 
-
     page++;
-
 
     if (page > 20) {
       throw new Error(
@@ -269,14 +260,14 @@ async function fetchAllLegacyEvents() {
     }
   }
 
-
   return {
     total,
-    pagesChecked: page,
-    events: allEvents
+    pagesChecked:
+      page,
+    events:
+      allEvents
   };
 }
-
 
 
 function isGreekLegacyEvent(event) {
@@ -290,18 +281,20 @@ function isGreekLegacyEvent(event) {
       event.full_address
     );
 
-
   return (
     country === "gr" ||
     country === "grc" ||
     country === "greece" ||
     country === "hellas" ||
     country === "ελλαδα" ||
-    address.includes("greece") ||
-    address.includes("ελλαδα")
+    address.includes(
+      "greece"
+    ) ||
+    address.includes(
+      "ελλαδα"
+    )
   );
 }
-
 
 
 function normalizeLegacyEvent(event) {
@@ -354,7 +347,6 @@ function normalizeLegacyEvent(event) {
 }
 
 
-
 /*
   PLAYRIFTBOUND SOURCE
 */
@@ -363,9 +355,10 @@ function playRiftboundEventType(
   value
 ) {
   const type =
-    String(value || "")
-      .toUpperCase();
-
+    String(
+      value || ""
+    )
+    .toUpperCase();
 
   const types = {
     NEXUS_NIGHT:
@@ -390,14 +383,12 @@ function playRiftboundEventType(
       "Cup"
   };
 
-
   return (
     types[type] ||
     value ||
     null
   );
 }
-
 
 
 function buildPlayRiftboundURL(
@@ -433,12 +424,10 @@ function buildPlayRiftboundURL(
     }
   };
 
-
   if (after) {
     variables.after =
       after;
   }
-
 
   const extensions = {
     clientLibrary: {
@@ -458,7 +447,6 @@ function buildPlayRiftboundURL(
     }
   };
 
-
   const params =
     new URLSearchParams({
       operationName:
@@ -475,12 +463,10 @@ function buildPlayRiftboundURL(
         )
     });
 
-
   return (
     `${PLAYRIFTBOUND_GQL}?${params.toString()}`
   );
 }
-
 
 
 async function fetchPlayRiftboundPage(
@@ -499,29 +485,52 @@ async function fetchPlayRiftboundPage(
           "accept":
             "application/graphql-response+json,application/json;q=0.9",
 
+          "accept-language":
+            "en-US,en;q=0.9,el;q=0.8",
+
+          "content-type":
+            "application/json",
+
           "apollographql-client-name":
             "Esports Web",
 
           "apollographql-client-version":
-            "230eb7a"
+            "230eb7a",
+
+          "referer":
+            "https://playriftbound.com/en-US/events"
         }
       }
     );
 
+  const responseText =
+    await response.text();
 
   if (!response.ok) {
     throw new Error(
-      `PlayRiftbound returned HTTP ${response.status}`
+      `PlayRiftbound returned HTTP ${response.status}: ${responseText}`
     );
   }
 
+  let body;
 
-  const body =
-    await response.json();
+  try {
+    body =
+      JSON.parse(
+        responseText
+      );
+  }
 
+  catch (_) {
+    throw new Error(
+      `PlayRiftbound returned invalid JSON: ${responseText}`
+    );
+  }
 
   if (
-    Array.isArray(body.errors) &&
+    Array.isArray(
+      body.errors
+    ) &&
     body.errors.length
   ) {
     const messages =
@@ -531,27 +540,25 @@ async function fetchPlayRiftboundPage(
             error?.message ||
             "Unknown GraphQL error"
         )
-        .join(" | ");
-
+        .join(
+          " | "
+        );
 
     throw new Error(
       `PlayRiftbound GraphQL error: ${messages}`
     );
   }
 
-
   const connection =
     body
       ?.data
       ?.competeTournamentSearch;
 
-
   if (!connection) {
     throw new Error(
-      "PlayRiftbound response did not contain competeTournamentSearch"
+      `PlayRiftbound response did not contain competeTournamentSearch: ${responseText}`
     );
   }
-
 
   const edges =
     Array.isArray(
@@ -560,7 +567,6 @@ async function fetchPlayRiftboundPage(
       ? connection.edges
       : [];
 
-
   return {
     nodes:
       edges
@@ -568,7 +574,9 @@ async function fetchPlayRiftboundPage(
           edge =>
             edge?.node
         )
-        .filter(Boolean),
+        .filter(
+          Boolean
+        ),
 
     pageInfo:
       connection.pageInfo ||
@@ -577,25 +585,23 @@ async function fetchPlayRiftboundPage(
 }
 
 
-
 async function fetchAllPlayRiftboundEvents() {
-  let after = null;
+  let after =
+    null;
 
-  let page = 0;
+  let page =
+    0;
 
   const eventsById =
     new Map();
 
-
   while (true) {
     page++;
-
 
     const result =
       await fetchPlayRiftboundPage(
         after
       );
-
 
     result.nodes.forEach(
       node => {
@@ -604,10 +610,7 @@ async function fetchAllPlayRiftboundEvents() {
             ?.tournament
             ?.id;
 
-
-        if (
-          tournamentId
-        ) {
+        if (tournamentId) {
           eventsById.set(
             String(
               tournamentId
@@ -618,7 +621,6 @@ async function fetchAllPlayRiftboundEvents() {
       }
     );
 
-
     const hasNextPage =
       Boolean(
         result
@@ -626,18 +628,15 @@ async function fetchAllPlayRiftboundEvents() {
           ?.hasNextPage
       );
 
-
     const endCursor =
       result
         .pageInfo
         ?.endCursor ||
       null;
 
-
     if (!hasNextPage) {
       break;
     }
-
 
     if (!endCursor) {
       throw new Error(
@@ -645,10 +644,8 @@ async function fetchAllPlayRiftboundEvents() {
       );
     }
 
-
     after =
       endCursor;
-
 
     if (
       page >=
@@ -659,7 +656,6 @@ async function fetchAllPlayRiftboundEvents() {
       );
     }
   }
-
 
   return {
     pagesChecked:
@@ -673,7 +669,6 @@ async function fetchAllPlayRiftboundEvents() {
 }
 
 
-
 function isGreekPlayRiftboundEvent(
   node
 ) {
@@ -684,7 +679,6 @@ function isGreekPlayRiftboundEvent(
         ?.physicalAddress
         ?.formattedAddress
     );
-
 
   return (
     address.includes(
@@ -698,12 +692,12 @@ function isGreekPlayRiftboundEvent(
 }
 
 
-
 function normalizePlayRiftboundEvent(
   node
 ) {
   const organizer =
-    node?.organizer || {};
+    node?.organizer ||
+    {};
 
   const location =
     organizer
@@ -711,7 +705,8 @@ function normalizePlayRiftboundEvent(
     {};
 
   const tournament =
-    node?.tournament || {};
+    node?.tournament ||
+    {};
 
   const tournamentId =
     tournament.id;
@@ -719,10 +714,8 @@ function normalizePlayRiftboundEvent(
   const organizerId =
     organizer.id;
 
-
   let eventURL =
     "https://playriftbound.com/en-US/events";
-
 
   if (
     organizerId &&
@@ -731,7 +724,6 @@ function normalizePlayRiftboundEvent(
     eventURL =
       `https://rgn.playriftbound.com/en-US/org/${encodeURIComponent(organizerId)}/events/${encodeURIComponent(tournamentId)}`;
   }
-
 
   return {
     external_id:
@@ -783,19 +775,8 @@ function normalizePlayRiftboundEvent(
 }
 
 
-
 /*
   SAFE D1 SYNC
-
-  Πρώτα γράφουμε όλα τα καινούργια events.
-
-  ΜΟΝΟ όταν ολοκληρωθούν όλα επιτυχώς
-  κάνουμε inactive όσα δεν εμφανίστηκαν
-  στο συγκεκριμένο sync.
-
-  Έτσι δεν κινδυνεύουμε να κάνουμε
-  κατά λάθος inactive όλη την πηγή
-  αν αποτύχει ένα batch.
 */
 
 async function syncSourceEvents(
@@ -804,7 +785,9 @@ async function syncSourceEvents(
   events
 ) {
   if (
-    !Array.isArray(events) ||
+    !Array.isArray(
+      events
+    ) ||
     events.length === 0
   ) {
     throw new Error(
@@ -812,11 +795,9 @@ async function syncSourceEvents(
     );
   }
 
-
   const syncStamp =
     new Date()
       .toISOString();
-
 
   const statements =
     events.map(
@@ -914,10 +895,8 @@ async function syncSourceEvents(
         )
     );
 
-
   const CHUNK_SIZE =
     50;
-
 
   for (
     let i = 0;
@@ -931,7 +910,6 @@ async function syncSourceEvents(
       )
     );
   }
-
 
   await env.DB.prepare(`
     UPDATE events
@@ -953,10 +931,10 @@ async function syncSourceEvents(
   )
   .run();
 
-
-  return events.length;
+  return (
+    events.length
+  );
 }
-
 
 
 /*
@@ -969,13 +947,11 @@ async function syncLegacySource(
   const locator =
     await fetchAllLegacyEvents();
 
-
   const greekEvents =
     locator.events
       .filter(
         isGreekLegacyEvent
       );
-
 
   const normalized =
     greekEvents
@@ -983,14 +959,12 @@ async function syncLegacySource(
         normalizeLegacyEvent
       );
 
-
   const synced =
     await syncSourceEvents(
       env,
       "legacy-locator",
       normalized
     );
-
 
   return {
     source:
@@ -1011,13 +985,11 @@ async function syncLegacySource(
 }
 
 
-
 async function syncPlayRiftboundSource(
   env
 ) {
   const result =
     await fetchAllPlayRiftboundEvents();
-
 
   const greekEvents =
     result.events
@@ -1025,13 +997,11 @@ async function syncPlayRiftboundSource(
         isGreekPlayRiftboundEvent
       );
 
-
   const normalized =
     greekEvents
       .map(
         normalizePlayRiftboundEvent
       );
-
 
   const synced =
     await syncSourceEvents(
@@ -1039,7 +1009,6 @@ async function syncPlayRiftboundSource(
       "playriftbound",
       normalized
     );
-
 
   return {
     source:
@@ -1060,14 +1029,8 @@ async function syncPlayRiftboundSource(
 }
 
 
-
 /*
   COMPLETE SYNC
-
-  Οι δύο πηγές είναι ανεξάρτητες.
-
-  Αν π.χ. το PlayRiftbound αλλάξει API,
-  το Legacy Locator συνεχίζει να ενημερώνεται.
 */
 
 async function runSync(
@@ -1079,8 +1042,8 @@ async function runSync(
   let playRiftboundResult =
     null;
 
-  const errors = {};
-
+  const errors =
+    {};
 
   try {
     legacyResult =
@@ -1094,7 +1057,6 @@ async function runSync(
       String(error);
   }
 
-
   try {
     playRiftboundResult =
       await syncPlayRiftboundSource(
@@ -1107,7 +1069,6 @@ async function runSync(
       String(error);
   }
 
-
   if (
     !legacyResult &&
     !playRiftboundResult
@@ -1117,7 +1078,6 @@ async function runSync(
     );
   }
 
-
   return {
     legacy_locator:
       legacyResult,
@@ -1126,31 +1086,17 @@ async function runSync(
       playRiftboundResult,
 
     partial_failure:
-      Object.keys(errors)
-        .length > 0,
+      Object.keys(
+        errors
+      ).length > 0,
 
     errors
   };
 }
 
 
-
 /*
   DEDUPLICATION
-
-  Αποθηκεύουμε και τις δύο πηγές στη D1,
-  αλλά δεν θέλουμε το ίδιο event
-  να εμφανίζεται δύο φορές στο site.
-
-  Όταν δύο events:
-  - είναι από διαφορετική πηγή
-  - είναι στο ίδιο κατάστημα / ίδιο σημείο
-  - ξεκινούν μέσα σε 5 λεπτά
-
-  θεωρούμε ότι είναι το ίδιο event.
-
-  Προτιμάμε PlayRiftbound,
-  επειδή είναι το νέο επίσημο σύστημα.
 */
 
 function sourcePriority(
@@ -1174,7 +1120,6 @@ function sourcePriority(
 }
 
 
-
 function sameVenue(
   a,
   b
@@ -1189,7 +1134,6 @@ function sameVenue(
       b.store_name
     );
 
-
   if (
     aStore &&
     bStore &&
@@ -1197,7 +1141,6 @@ function sameVenue(
   ) {
     return true;
   }
-
 
   const aLat =
     safeCoordinate(
@@ -1219,7 +1162,6 @@ function sameVenue(
       b.longitude
     );
 
-
   if (
     aLat === null ||
     aLon === null ||
@@ -1228,7 +1170,6 @@ function sameVenue(
   ) {
     return false;
   }
-
 
   return (
     distanceKm(
@@ -1242,7 +1183,6 @@ function sameVenue(
 }
 
 
-
 function likelySameEvent(
   a,
   b
@@ -1254,7 +1194,6 @@ function likelySameEvent(
     return false;
   }
 
-
   if (
     a.source ===
     b.source
@@ -1262,13 +1201,14 @@ function likelySameEvent(
     return false;
   }
 
-
   if (
-    !sameVenue(a,b)
+    !sameVenue(
+      a,
+      b
+    )
   ) {
     return false;
   }
-
 
   const aTime =
     Date.parse(
@@ -1280,20 +1220,22 @@ function likelySameEvent(
       b.start_time
     );
 
-
   if (
-    !Number.isFinite(aTime) ||
-    !Number.isFinite(bTime)
+    !Number.isFinite(
+      aTime
+    ) ||
+    !Number.isFinite(
+      bTime
+    )
   ) {
     return false;
   }
 
-
   const difference =
     Math.abs(
-      aTime - bTime
+      aTime -
+      bTime
     );
-
 
   return (
     difference <=
@@ -1302,22 +1244,30 @@ function likelySameEvent(
 }
 
 
-
 function dedupeEvents(
   events
 ) {
   const sorted =
     [...events]
       .sort(
-        (a,b) => {
+        (
+          a,
+          b
+        ) => {
           const priority =
-            sourcePriority(b) -
-            sourcePriority(a);
+            sourcePriority(
+              b
+            )
+            -
+            sourcePriority(
+              a
+            );
 
-          if (priority !== 0) {
+          if (
+            priority !== 0
+          ) {
             return priority;
           }
-
 
           const aTime =
             Date.parse(
@@ -1329,29 +1279,31 @@ function dedupeEvents(
               b.start_time
             );
 
-
           if (
-            !Number.isFinite(aTime)
+            !Number.isFinite(
+              aTime
+            )
           ) {
             return 1;
           }
 
           if (
-            !Number.isFinite(bTime)
+            !Number.isFinite(
+              bTime
+            )
           ) {
             return -1;
           }
 
-
           return (
-            aTime - bTime
+            aTime -
+            bTime
           );
         }
       );
 
-
-  const kept = [];
-
+  const kept =
+    [];
 
   for (
     const event of sorted
@@ -1365,15 +1317,18 @@ function dedupeEvents(
           )
       );
 
-
     if (!duplicate) {
-      kept.push(event);
+      kept.push(
+        event
+      );
     }
   }
 
-
   kept.sort(
-    (a,b) => {
+    (
+      a,
+      b
+    ) => {
       const aTime =
         Date.parse(
           a.start_time
@@ -1384,30 +1339,31 @@ function dedupeEvents(
           b.start_time
         );
 
-
       if (
-        !Number.isFinite(aTime)
+        !Number.isFinite(
+          aTime
+        )
       ) {
         return 1;
       }
 
       if (
-        !Number.isFinite(bTime)
+        !Number.isFinite(
+          bTime
+        )
       ) {
         return -1;
       }
 
-
       return (
-        aTime - bTime
+        aTime -
+        bTime
       );
     }
   );
 
-
   return kept;
 }
-
 
 
 /*
@@ -1434,11 +1390,12 @@ function jsonResponse(
 }
 
 
-
 async function getUpcomingEvents(
   env
 ) {
-  const { results } =
+  const {
+    results
+  } =
     await env.DB.prepare(`
       SELECT
         external_id,
@@ -1464,12 +1421,12 @@ async function getUpcomingEvents(
     `)
     .all();
 
-
-  return dedupeEvents(
-    results
+  return (
+    dedupeEvents(
+      results
+    )
   );
 }
-
 
 
 async function getCalendarEvents(
@@ -1479,8 +1436,9 @@ async function getCalendarEvents(
     new Date()
       .toISOString();
 
-
-  const { results } =
+  const {
+    results
+  } =
     await env.DB.prepare(`
       SELECT
         external_id,
@@ -1509,15 +1467,17 @@ async function getCalendarEvents(
       ORDER BY
         start_time ASC
     `)
-    .bind(now)
+    .bind(
+      now
+    )
     .all();
 
-
-  return dedupeEvents(
-    results
+  return (
+    dedupeEvents(
+      results
+    )
   );
 }
-
 
 
 /*
@@ -1549,7 +1509,6 @@ export default {
             env
           );
 
-
         return jsonResponse(
           {
             success:
@@ -1576,7 +1535,6 @@ export default {
     }
 
 
-
     /*
       UPCOMING EVENTS
     */
@@ -1590,12 +1548,10 @@ export default {
           env
         );
 
-
       return jsonResponse(
         events
       );
     }
-
 
 
     /*
@@ -1611,12 +1567,10 @@ export default {
           env
         );
 
-
       return jsonResponse(
         events
       );
     }
-
 
 
     /*
@@ -1650,7 +1604,6 @@ export default {
         `)
         .first();
 
-
       const {
         results:
           activeRows
@@ -1676,7 +1629,6 @@ export default {
             status = 'active'
         `)
         .all();
-
 
       const {
         results:
@@ -1714,13 +1666,11 @@ export default {
         `)
         .all();
 
-
-      const sources = {};
-
+      const sources =
+        {};
 
       for (
-        const row of
-        sourceRows
+        const row of sourceRows
       ) {
         sources[
           row.source
@@ -1736,7 +1686,6 @@ export default {
             )
         };
       }
-
 
       return jsonResponse(
         {
@@ -1760,7 +1709,6 @@ export default {
     }
 
 
-
     return new Response(
       "Riftbound Events API is online!",
       {
@@ -1771,7 +1719,6 @@ export default {
       }
     );
   },
-
 
 
   async scheduled(
