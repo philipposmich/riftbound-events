@@ -17,25 +17,226 @@ const LEGACY_PAGE_SIZE =
   PLAYRIFTBOUND
 */
 
-const PLAYRIFTBOUND_CENTER = {
-  latitude: 37.9842,
-  longitude: 23.7353
-};
-
 const PLAYRIFTBOUND_RADIUS_METERS =
   32187;
 
 const PLAYRIFTBOUND_PAGE_SIZE =
   20;
 
-const PLAYRIFTBOUND_MAX_PAGES =
-  60;
+const PLAYRIFTBOUND_MAX_PAGES_PER_AREA =
+  20;
+
+/*
+  Safety limit ώστε να μη φύγουμε
+  σε υπερβολικό αριθμό requests
+  αν αλλάξει κάτι απρόβλεπτα στο API.
+*/
+const PLAYRIFTBOUND_MAX_TOTAL_REQUESTS =
+  45;
 
 const PLAYRIFTBOUND_OPERATION =
   "CompeteTournamentSearch";
 
 const PLAYRIFTBOUND_QUERY_HASH =
   "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
+
+
+/*
+  SEARCH AREAS
+
+  Η ακτίνα που έχουμε επιβεβαιώσει ότι
+  δέχεται το PlayRiftbound είναι 32.187 km.
+
+  Χρησιμοποιούμε πολλά regional hubs
+  ώστε να καλύπτουμε την ελληνική
+  Organized Play σκηνή σε όλη τη χώρα.
+
+  Τα ίδια tournaments μπορεί να βρεθούν
+  από πάνω από ένα search point.
+  Γίνεται dedupe με tournament.id.
+*/
+
+const PLAYRIFTBOUND_SEARCH_AREAS = [
+  {
+    name: "Athens",
+    latitude: 37.9842,
+    longitude: 23.7353
+  },
+
+  {
+    name: "Chalkida",
+    latitude: 38.4636,
+    longitude: 23.5994
+  },
+
+  {
+    name: "Corinth",
+    latitude: 37.9386,
+    longitude: 22.9322
+  },
+
+  {
+    name: "Patras",
+    latitude: 38.2466,
+    longitude: 21.7346
+  },
+
+  {
+    name: "Kalamata",
+    latitude: 37.0389,
+    longitude: 22.1142
+  },
+
+  {
+    name: "Tripoli",
+    latitude: 37.5101,
+    longitude: 22.3726
+  },
+
+  {
+    name: "Lamia",
+    latitude: 38.8993,
+    longitude: 22.4332
+  },
+
+  {
+    name: "Volos",
+    latitude: 39.3610,
+    longitude: 22.9426
+  },
+
+  {
+    name: "Larisa",
+    latitude: 39.6390,
+    longitude: 22.4191
+  },
+
+  {
+    name: "Trikala",
+    latitude: 39.5557,
+    longitude: 21.7679
+  },
+
+  {
+    name: "Ioannina",
+    latitude: 39.6650,
+    longitude: 20.8537
+  },
+
+  {
+    name: "Agrinio",
+    latitude: 38.6214,
+    longitude: 21.4078
+  },
+
+  {
+    name: "Thessaloniki",
+    latitude: 40.6401,
+    longitude: 22.9444
+  },
+
+  {
+    name: "Skydra",
+    latitude: 40.7680,
+    longitude: 22.1514
+  },
+
+  {
+    name: "Kozani",
+    latitude: 40.3007,
+    longitude: 21.7889
+  },
+
+  {
+    name: "Serres",
+    latitude: 41.0909,
+    longitude: 23.5413
+  },
+
+  {
+    name: "Kavala",
+    latitude: 40.9396,
+    longitude: 24.4069
+  },
+
+  {
+    name: "Xanthi",
+    latitude: 41.1349,
+    longitude: 24.8880
+  },
+
+  {
+    name: "Komotini",
+    latitude: 41.1192,
+    longitude: 25.4054
+  },
+
+  {
+    name: "Alexandroupoli",
+    latitude: 40.8457,
+    longitude: 25.8739
+  },
+
+  {
+    name: "Corfu",
+    latitude: 39.6243,
+    longitude: 19.9217
+  },
+
+  {
+    name: "Zakynthos",
+    latitude: 37.7870,
+    longitude: 20.8999
+  },
+
+  {
+    name: "Heraklion",
+    latitude: 35.3387,
+    longitude: 25.1442
+  },
+
+  {
+    name: "Chania",
+    latitude: 35.5138,
+    longitude: 24.0180
+  },
+
+  {
+    name: "Rhodes",
+    latitude: 36.4341,
+    longitude: 28.2176
+  },
+
+  {
+    name: "Kos",
+    latitude: 36.8937,
+    longitude: 27.2877
+  },
+
+  {
+    name: "Mytilene",
+    latitude: 39.1079,
+    longitude: 26.5553
+  },
+
+  {
+    name: "Chios",
+    latitude: 38.3688,
+    longitude: 26.1358
+  },
+
+  {
+    name: "Samos",
+    latitude: 37.7548,
+    longitude: 26.9770
+  },
+
+  {
+    name: "Syros",
+    latitude: 37.4447,
+    longitude: 24.9429
+  }
+];
 
 
 /*
@@ -264,6 +465,7 @@ async function fetchAllLegacyEvents() {
     total,
     pagesChecked:
       page,
+
     events:
       allEvents
   };
@@ -392,6 +594,7 @@ function playRiftboundEventType(
 
 
 function buildPlayRiftboundURL(
+  area,
   after = null
 ) {
   const variables = {
@@ -405,12 +608,10 @@ function buildPlayRiftboundURL(
       rb: {
         coords: {
           latitude:
-            PLAYRIFTBOUND_CENTER
-              .latitude,
+            area.latitude,
 
           longitude:
-            PLAYRIFTBOUND_CENTER
-              .longitude
+            area.longitude
         },
 
         distanceMeters:
@@ -470,11 +671,13 @@ function buildPlayRiftboundURL(
 
 
 async function fetchPlayRiftboundPage(
+  area,
   after = null
 ) {
   const response =
     await fetch(
       buildPlayRiftboundURL(
+        area,
         after
       ),
       {
@@ -508,7 +711,7 @@ async function fetchPlayRiftboundPage(
 
   if (!response.ok) {
     throw new Error(
-      `PlayRiftbound returned HTTP ${response.status}: ${responseText}`
+      `PlayRiftbound ${area.name} returned HTTP ${response.status}: ${responseText}`
     );
   }
 
@@ -523,7 +726,7 @@ async function fetchPlayRiftboundPage(
 
   catch (_) {
     throw new Error(
-      `PlayRiftbound returned invalid JSON: ${responseText}`
+      `PlayRiftbound ${area.name} returned invalid JSON: ${responseText}`
     );
   }
 
@@ -545,7 +748,7 @@ async function fetchPlayRiftboundPage(
         );
 
     throw new Error(
-      `PlayRiftbound GraphQL error: ${messages}`
+      `PlayRiftbound ${area.name} GraphQL error: ${messages}`
     );
   }
 
@@ -556,7 +759,7 @@ async function fetchPlayRiftboundPage(
 
   if (!connection) {
     throw new Error(
-      `PlayRiftbound response did not contain competeTournamentSearch: ${responseText}`
+      `PlayRiftbound ${area.name} response did not contain competeTournamentSearch`
     );
   }
 
@@ -585,7 +788,10 @@ async function fetchPlayRiftboundPage(
 }
 
 
-async function fetchAllPlayRiftboundEvents() {
+async function fetchPlayRiftboundArea(
+  area,
+  requestCounter
+) {
   let after =
     null;
 
@@ -596,30 +802,43 @@ async function fetchAllPlayRiftboundEvents() {
     new Map();
 
   while (true) {
+    if (
+      requestCounter.count >=
+      PLAYRIFTBOUND_MAX_TOTAL_REQUESTS
+    ) {
+      throw new Error(
+        `PlayRiftbound safety stop: reached ${PLAYRIFTBOUND_MAX_TOTAL_REQUESTS} total API requests`
+      );
+    }
+
     page++;
+
+    requestCounter.count++;
 
     const result =
       await fetchPlayRiftboundPage(
+        area,
         after
       );
 
-    result.nodes.forEach(
-      node => {
-        const tournamentId =
-          node
-            ?.tournament
-            ?.id;
+    for (
+      const node of
+      result.nodes
+    ) {
+      const tournamentId =
+        node
+          ?.tournament
+          ?.id;
 
-        if (tournamentId) {
-          eventsById.set(
-            String(
-              tournamentId
-            ),
-            node
-          );
-        }
+      if (tournamentId) {
+        eventsById.set(
+          String(
+            tournamentId
+          ),
+          node
+        );
       }
-    );
+    }
 
     const hasNextPage =
       Boolean(
@@ -640,7 +859,7 @@ async function fetchAllPlayRiftboundEvents() {
 
     if (!endCursor) {
       throw new Error(
-        "PlayRiftbound pagination says there is another page but did not return an endCursor"
+        `PlayRiftbound ${area.name}: hasNextPage=true but endCursor is missing`
       );
     }
 
@@ -649,21 +868,93 @@ async function fetchAllPlayRiftboundEvents() {
 
     if (
       page >=
-      PLAYRIFTBOUND_MAX_PAGES
+      PLAYRIFTBOUND_MAX_PAGES_PER_AREA
     ) {
       throw new Error(
-        `PlayRiftbound safety stop after ${PLAYRIFTBOUND_MAX_PAGES} pages`
+        `PlayRiftbound ${area.name}: safety stop after ${PLAYRIFTBOUND_MAX_PAGES_PER_AREA} pages`
       );
     }
   }
 
   return {
+    area:
+      area.name,
+
     pagesChecked:
       page,
 
     events:
       [
         ...eventsById.values()
+      ]
+  };
+}
+
+
+async function fetchAllPlayRiftboundEvents() {
+  const allEventsById =
+    new Map();
+
+  const areaResults =
+    [];
+
+  const requestCounter = {
+    count: 0
+  };
+
+  for (
+    const area of
+    PLAYRIFTBOUND_SEARCH_AREAS
+  ) {
+    const result =
+      await fetchPlayRiftboundArea(
+        area,
+        requestCounter
+      );
+
+    areaResults.push({
+      area:
+        result.area,
+
+      pages_checked:
+        result.pagesChecked,
+
+      events_found:
+        result.events.length
+    });
+
+    for (
+      const node of
+      result.events
+    ) {
+      const tournamentId =
+        node
+          ?.tournament
+          ?.id;
+
+      if (tournamentId) {
+        allEventsById.set(
+          String(
+            tournamentId
+          ),
+          node
+        );
+      }
+    }
+  }
+
+  return {
+    requestsMade:
+      requestCounter.count,
+
+    searchAreas:
+      PLAYRIFTBOUND_SEARCH_AREAS.length,
+
+    areaResults,
+
+    events:
+      [
+        ...allEventsById.values()
       ]
   };
 }
@@ -777,6 +1068,17 @@ function normalizePlayRiftboundEvent(
 
 /*
   SAFE D1 SYNC
+
+  Πρώτα γράφονται όλα τα νέα events.
+
+  Μόνο αφού ολοκληρωθεί επιτυχώς
+  ολόκληρη η αναζήτηση της πηγής,
+  γίνονται inactive όσα δεν εμφανίστηκαν.
+
+  Αν αποτύχει οποιοδήποτε regional search,
+  το PlayRiftbound sync αποτυγχάνει συνολικά
+  και η προηγούμενη σωστή κατάσταση μένει
+  στη D1.
 */
 
 async function syncSourceEvents(
@@ -1014,8 +1316,11 @@ async function syncPlayRiftboundSource(
     source:
       "playriftbound",
 
-    pages_checked:
-      result.pagesChecked,
+    search_areas:
+      result.searchAreas,
+
+    api_requests:
+      result.requestsMade,
 
     events_downloaded:
       result.events.length,
@@ -1024,13 +1329,21 @@ async function syncPlayRiftboundSource(
       greekEvents.length,
 
     events_synced:
-      synced
+      synced,
+
+    areas:
+      result.areaResults
   };
 }
 
 
 /*
   COMPLETE SYNC
+
+  Legacy + PlayRiftbound είναι ανεξάρτητα.
+
+  Αν το ένα source αποτύχει,
+  το άλλο συνεχίζει να ενημερώνεται.
 */
 
 async function runSync(
@@ -1096,7 +1409,19 @@ async function runSync(
 
 
 /*
-  DEDUPLICATION
+  FRONTEND DEDUPLICATION
+
+  Τα δύο sources μπορούν προσωρινά
+  να έχουν το ίδιο event.
+
+  Αν είναι:
+  - διαφορετικές πηγές
+  - ίδιο κατάστημα / σχεδόν ίδιο σημείο
+  - ώρα έναρξης μέσα σε 5 λεπτά
+
+  θεωρείται το ίδιο event.
+
+  Προτεραιότητα έχει το PlayRiftbound.
 */
 
 function sourcePriority(
@@ -1670,7 +1995,8 @@ export default {
         {};
 
       for (
-        const row of sourceRows
+        const row of
+        sourceRows
       ) {
         sources[
           row.source
