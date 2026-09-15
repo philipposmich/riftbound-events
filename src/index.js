@@ -1,21 +1,171 @@
-const LOCATOR_API =
+const LEGACY_LOCATOR_API =
   "https://api.cloudflare.riftbound.uvsgames.com/hydraproxy/api/v2";
 
-const PAGE_SIZE = 250;
+const PLAYRIFTBOUND_GQL =
+  "https://playriftbound.com/api/gql";
+
+
+/*
+  LEGACY LOCATOR
+*/
+
+const LEGACY_PAGE_SIZE = 250;
+
+
+/*
+  PLAYRIFTBOUND
+
+  600 km από Αθήνα καλύπτουν πρακτικά
+  όλη την Ελλάδα.
+
+  Το captured request του site χρησιμοποιούσε
+  32.187 m. Θα επιβεβαιώσουμε με το πρώτο
+  sync-test ότι το API δέχεται τη μεγαλύτερη
+  ακτίνα.
+*/
+
+const PLAYRIFTBOUND_CENTER = {
+  latitude: 37.9842,
+  longitude: 23.7353
+};
+
+const PLAYRIFTBOUND_RADIUS_METERS =
+  600000;
+
+const PLAYRIFTBOUND_PAGE_SIZE =
+  20;
+
+const PLAYRIFTBOUND_MAX_PAGES =
+  60;
+
+const PLAYRIFTBOUND_OPERATION =
+  "CompeteTournamentSearch";
+
+const PLAYRIFTBOUND_QUERY_HASH =
+  "acbcbba681a9c9a8063f792f7d665ba1eda81b19528b6af19e523f0c2061bec2";
 
 
 
-async function fetchAllLocatorEvents() {
-  const startDate = new Date();
+/*
+  GENERAL HELPERS
+*/
 
-  const endDate = new Date();
+function normalizeText(value) {
+  return String(value || "")
+    .trim()
+    .toLocaleLowerCase("el-GR")
+    .normalize("NFD")
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    );
+}
+
+
+
+function normalizeVenueName(value) {
+  return normalizeText(value)
+    .replace(
+      /[^\p{L}\p{N}]+/gu,
+      ""
+    );
+}
+
+
+
+function safeCoordinate(value) {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+    return null;
+  }
+
+  const number =
+    Number(value);
+
+  return Number.isFinite(number)
+    ? number
+    : null;
+}
+
+
+
+function degreesToRadians(value) {
+  return (
+    value *
+    Math.PI /
+    180
+  );
+}
+
+
+
+function distanceKm(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+) {
+  const radius =
+    6371;
+
+  const dLat =
+    degreesToRadians(
+      lat2 - lat1
+    );
+
+  const dLon =
+    degreesToRadians(
+      lon2 - lon1
+    );
+
+  const a =
+    Math.sin(dLat / 2) ** 2
+    +
+    Math.cos(
+      degreesToRadians(lat1)
+    )
+    *
+    Math.cos(
+      degreesToRadians(lat2)
+    )
+    *
+    Math.sin(dLon / 2) ** 2;
+
+  const c =
+    2 *
+    Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1 - a)
+    );
+
+  return radius * c;
+}
+
+
+
+/*
+  LEGACY SOURCE
+*/
+
+async function fetchAllLegacyEvents() {
+  const startDate =
+    new Date();
+
+  const endDate =
+    new Date();
+
   endDate.setDate(
     endDate.getDate() + 90
   );
 
+
   let page = 1;
   let total = null;
-  let allEvents = [];
+
+  const allEvents = [];
 
 
   while (true) {
@@ -49,16 +199,19 @@ async function fetchAllLocatorEvents() {
           String(page),
 
         page_size:
-          String(PAGE_SIZE)
+          String(
+            LEGACY_PAGE_SIZE
+          )
       });
 
 
     const response =
       await fetch(
-        `${LOCATOR_API}/events/?${params.toString()}`,
+        `${LEGACY_LOCATOR_API}/events/?${params.toString()}`,
         {
           headers: {
-            Accept: "application/json"
+            Accept:
+              "application/json"
           }
         }
       );
@@ -66,7 +219,7 @@ async function fetchAllLocatorEvents() {
 
     if (!response.ok) {
       throw new Error(
-        `Locator returned HTTP ${response.status} on page ${page}`
+        `Legacy Locator returned HTTP ${response.status} on page ${page}`
       );
     }
 
@@ -76,14 +229,18 @@ async function fetchAllLocatorEvents() {
 
 
     const pageEvents =
-      Array.isArray(data.results)
+      Array.isArray(
+        data.results
+      )
         ? data.results
         : [];
 
 
     if (total === null) {
       total =
-        Number(data.total || 0);
+        Number(
+          data.total || 0
+        );
     }
 
 
@@ -94,7 +251,8 @@ async function fetchAllLocatorEvents() {
 
     if (
       pageEvents.length === 0 ||
-      pageEvents.length < PAGE_SIZE ||
+      pageEvents.length <
+        LEGACY_PAGE_SIZE ||
       allEvents.length >= total
     ) {
       break;
@@ -106,7 +264,7 @@ async function fetchAllLocatorEvents() {
 
     if (page > 20) {
       throw new Error(
-        "Safety stop: too many locator pages"
+        "Legacy safety stop: too many pages"
       );
     }
   }
@@ -121,21 +279,16 @@ async function fetchAllLocatorEvents() {
 
 
 
-function isGreekEvent(event) {
+function isGreekLegacyEvent(event) {
   const country =
-    String(
-      event.store?.country || ""
-    )
-    .trim()
-    .toLowerCase();
-
+    normalizeText(
+      event.store?.country
+    );
 
   const address =
-    String(
-      event.full_address || ""
-    )
-    .trim()
-    .toLowerCase();
+    normalizeText(
+      event.full_address
+    );
 
 
   return (
@@ -143,68 +296,532 @@ function isGreekEvent(event) {
     country === "grc" ||
     country === "greece" ||
     country === "hellas" ||
-    country === "ελλάδα" ||
+    country === "ελλαδα" ||
     address.includes("greece") ||
-    address.includes("ελλάδα")
+    address.includes("ελλαδα")
   );
 }
 
 
 
-function safeCoordinate(value) {
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-    return null;
-  }
+function normalizeLegacyEvent(event) {
+  return {
+    external_id:
+      `legacy:${event.id}`,
 
-  const number =
-    Number(value);
+    title:
+      event.name ||
+      "Riftbound Event",
 
-  return Number.isFinite(number)
-    ? number
-    : null;
+    store_name:
+      event.store?.name ||
+      null,
+
+    city:
+      event.store?.city ||
+      null,
+
+    address:
+      event.full_address ||
+      null,
+
+    event_type:
+      event.event_type ||
+      null,
+
+    start_time:
+      event.start_datetime ||
+      null,
+
+    event_url:
+      `https://locator.riftbound.uvsgames.com/events/${event.id}`,
+
+    latitude:
+      safeCoordinate(
+        event.latitude ??
+        event.store?.latitude
+      ),
+
+    longitude:
+      safeCoordinate(
+        event.longitude ??
+        event.store?.longitude
+      ),
+
+    source:
+      "legacy-locator"
+  };
 }
 
 
 
-async function syncGreekEvents(
-  env,
-  greekEvents
+/*
+  PLAYRIFTBOUND SOURCE
+*/
+
+function playRiftboundEventType(
+  value
 ) {
-  await env.DB.prepare(`
-    UPDATE events
-    SET
-      status = 'inactive',
-      updated_at = CURRENT_TIMESTAMP
-    WHERE source = 'legacy-locator'
-  `).run();
+  const type =
+    String(value || "")
+      .toUpperCase();
+
+
+  const types = {
+    NEXUS_NIGHT:
+      "Nexus Night",
+
+    SUMMONER_SKIRMISH:
+      "Summoner Skirmish",
+
+    PRE_RIFT:
+      "Pre-Rift",
+
+    SHOWDOWN:
+      "Showdown",
+
+    REGIONAL:
+      "Regional",
+
+    CHALLENGE:
+      "Challenge",
+
+    CUP:
+      "Cup"
+  };
+
+
+  return (
+    types[type] ||
+    value ||
+    null
+  );
+}
+
+
+
+function buildPlayRiftboundURL(
+  after = null
+) {
+  const variables = {
+    sport:
+      "rb",
+
+    first:
+      PLAYRIFTBOUND_PAGE_SIZE,
+
+    filter: {
+      rb: {
+        coords: {
+          latitude:
+            PLAYRIFTBOUND_CENTER
+              .latitude,
+
+          longitude:
+            PLAYRIFTBOUND_CENTER
+              .longitude
+        },
+
+        distanceMeters:
+          PLAYRIFTBOUND_RADIUS_METERS
+      }
+    },
+
+    sortBy: {
+      rb:
+        "DATE"
+    }
+  };
+
+
+  if (after) {
+    variables.after =
+      after;
+  }
+
+
+  const extensions = {
+    clientLibrary: {
+      name:
+        "@apollo/client",
+
+      version:
+        "4.1.9"
+    },
+
+    persistedQuery: {
+      version:
+        1,
+
+      sha256Hash:
+        PLAYRIFTBOUND_QUERY_HASH
+    }
+  };
+
+
+  const params =
+    new URLSearchParams({
+      operationName:
+        PLAYRIFTBOUND_OPERATION,
+
+      variables:
+        JSON.stringify(
+          variables
+        ),
+
+      extensions:
+        JSON.stringify(
+          extensions
+        )
+    });
+
+
+  return (
+    `${PLAYRIFTBOUND_GQL}?${params.toString()}`
+  );
+}
+
+
+
+async function fetchPlayRiftboundPage(
+  after = null
+) {
+  const response =
+    await fetch(
+      buildPlayRiftboundURL(
+        after
+      ),
+      {
+        method:
+          "GET",
+
+        headers: {
+          "accept":
+            "application/graphql-response+json,application/json;q=0.9",
+
+          "apollographql-client-name":
+            "Esports Web",
+
+          "apollographql-client-version":
+            "230eb7a"
+        }
+      }
+    );
+
+
+  if (!response.ok) {
+    throw new Error(
+      `PlayRiftbound returned HTTP ${response.status}`
+    );
+  }
+
+
+  const body =
+    await response.json();
+
+
+  if (
+    Array.isArray(body.errors) &&
+    body.errors.length
+  ) {
+    const messages =
+      body.errors
+        .map(
+          error =>
+            error?.message ||
+            "Unknown GraphQL error"
+        )
+        .join(" | ");
+
+
+    throw new Error(
+      `PlayRiftbound GraphQL error: ${messages}`
+    );
+  }
+
+
+  const connection =
+    body
+      ?.data
+      ?.competeTournamentSearch;
+
+
+  if (!connection) {
+    throw new Error(
+      "PlayRiftbound response did not contain competeTournamentSearch"
+    );
+  }
+
+
+  const edges =
+    Array.isArray(
+      connection.edges
+    )
+      ? connection.edges
+      : [];
+
+
+  return {
+    nodes:
+      edges
+        .map(
+          edge =>
+            edge?.node
+        )
+        .filter(Boolean),
+
+    pageInfo:
+      connection.pageInfo ||
+      {}
+  };
+}
+
+
+
+async function fetchAllPlayRiftboundEvents() {
+  let after = null;
+
+  let page = 0;
+
+  const eventsById =
+    new Map();
+
+
+  while (true) {
+    page++;
+
+
+    const result =
+      await fetchPlayRiftboundPage(
+        after
+      );
+
+
+    result.nodes.forEach(
+      node => {
+        const tournamentId =
+          node
+            ?.tournament
+            ?.id;
+
+
+        if (
+          tournamentId
+        ) {
+          eventsById.set(
+            String(
+              tournamentId
+            ),
+            node
+          );
+        }
+      }
+    );
+
+
+    const hasNextPage =
+      Boolean(
+        result
+          .pageInfo
+          ?.hasNextPage
+      );
+
+
+    const endCursor =
+      result
+        .pageInfo
+        ?.endCursor ||
+      null;
+
+
+    if (!hasNextPage) {
+      break;
+    }
+
+
+    if (!endCursor) {
+      throw new Error(
+        "PlayRiftbound pagination says there is another page but did not return an endCursor"
+      );
+    }
+
+
+    after =
+      endCursor;
+
+
+    if (
+      page >=
+      PLAYRIFTBOUND_MAX_PAGES
+    ) {
+      throw new Error(
+        `PlayRiftbound safety stop after ${PLAYRIFTBOUND_MAX_PAGES} pages`
+      );
+    }
+  }
+
+
+  return {
+    pagesChecked:
+      page,
+
+    events:
+      [
+        ...eventsById.values()
+      ]
+  };
+}
+
+
+
+function isGreekPlayRiftboundEvent(
+  node
+) {
+  const address =
+    normalizeText(
+      node
+        ?.organizer
+        ?.physicalAddress
+        ?.formattedAddress
+    );
+
+
+  return (
+    address.includes(
+      "greece"
+    )
+    ||
+    address.includes(
+      "ελλαδα"
+    )
+  );
+}
+
+
+
+function normalizePlayRiftboundEvent(
+  node
+) {
+  const organizer =
+    node?.organizer || {};
+
+  const location =
+    organizer
+      ?.physicalAddress ||
+    {};
+
+  const tournament =
+    node?.tournament || {};
+
+  const tournamentId =
+    tournament.id;
+
+  const organizerId =
+    organizer.id;
+
+
+  let eventURL =
+    "https://playriftbound.com/en-US/events";
+
+
+  if (
+    organizerId &&
+    tournamentId
+  ) {
+    eventURL =
+      `https://rgn.playriftbound.com/en-US/org/${encodeURIComponent(organizerId)}/events/${encodeURIComponent(tournamentId)}`;
+  }
+
+
+  return {
+    external_id:
+      `playriftbound:${tournamentId}`,
+
+    title:
+      tournament.name ||
+      "Riftbound Event",
+
+    store_name:
+      organizer.name ||
+      null,
+
+    city:
+      location.city ||
+      null,
+
+    address:
+      location.formattedAddress ||
+      null,
+
+    event_type:
+      playRiftboundEventType(
+        tournament
+          ?.config
+          ?.tournamentType
+      ),
+
+    start_time:
+      tournament.startsAt ||
+      null,
+
+    event_url:
+      eventURL,
+
+    latitude:
+      safeCoordinate(
+        location.latitude
+      ),
+
+    longitude:
+      safeCoordinate(
+        location.longitude
+      ),
+
+    source:
+      "playriftbound"
+  };
+}
+
+
+
+/*
+  SAFE D1 SYNC
+
+  Πρώτα γράφουμε όλα τα καινούργια events.
+
+  ΜΟΝΟ όταν ολοκληρωθούν όλα επιτυχώς
+  κάνουμε inactive όσα δεν εμφανίστηκαν
+  στο συγκεκριμένο sync.
+
+  Έτσι δεν κινδυνεύουμε να κάνουμε
+  κατά λάθος inactive όλη την πηγή
+  αν αποτύχει ένα batch.
+*/
+
+async function syncSourceEvents(
+  env,
+  source,
+  events
+) {
+  if (
+    !Array.isArray(events) ||
+    events.length === 0
+  ) {
+    throw new Error(
+      `${source} returned zero Greek events. Refusing to mark existing events inactive.`
+    );
+  }
+
+
+  const syncStamp =
+    new Date()
+      .toISOString();
 
 
   const statements =
-    greekEvents.map(
-      event => {
-        const externalId =
-          `legacy:${event.id}`;
-
-
-        const latitude =
-          safeCoordinate(
-            event.latitude ??
-            event.store?.latitude
-          );
-
-
-        const longitude =
-          safeCoordinate(
-            event.longitude ??
-            event.store?.longitude
-          );
-
-
-        return env.DB.prepare(`
+    events.map(
+      event =>
+        env.DB.prepare(`
           INSERT INTO events (
             external_id,
             title,
@@ -234,59 +851,72 @@ async function syncGreekEvents(
             ?,
             ?,
             'active',
-            'legacy-locator',
-            CURRENT_TIMESTAMP,
+            ?,
+            ?,
             CURRENT_TIMESTAMP
           )
 
           ON CONFLICT(external_id)
 
           DO UPDATE SET
-            title = excluded.title,
-            store_name = excluded.store_name,
-            city = excluded.city,
-            address = excluded.address,
-            event_type = excluded.event_type,
-            start_time = excluded.start_time,
-            event_url = excluded.event_url,
-            latitude = excluded.latitude,
-            longitude = excluded.longitude,
-            status = 'active',
-            source = 'legacy-locator',
-            last_seen_at = CURRENT_TIMESTAMP,
-            updated_at = CURRENT_TIMESTAMP
-        `).bind(
-          externalId,
+            title =
+              excluded.title,
 
-          event.name ||
-            "Riftbound Event",
+            store_name =
+              excluded.store_name,
 
-          event.store?.name ||
-            null,
+            city =
+              excluded.city,
 
-          event.store?.city ||
-            null,
+            address =
+              excluded.address,
 
-          event.full_address ||
-            null,
+            event_type =
+              excluded.event_type,
 
-          event.event_type ||
-            null,
+            start_time =
+              excluded.start_time,
 
-          event.start_datetime ||
-            null,
+            event_url =
+              excluded.event_url,
 
-          `https://locator.riftbound.uvsgames.com/events/${event.id}`,
+            latitude =
+              excluded.latitude,
 
-          latitude,
+            longitude =
+              excluded.longitude,
 
-          longitude
-        );
-      }
+            status =
+              'active',
+
+            source =
+              excluded.source,
+
+            last_seen_at =
+              excluded.last_seen_at,
+
+            updated_at =
+              CURRENT_TIMESTAMP
+        `)
+        .bind(
+          event.external_id,
+          event.title,
+          event.store_name,
+          event.city,
+          event.address,
+          event.event_type,
+          event.start_time,
+          event.event_url,
+          event.latitude,
+          event.longitude,
+          source,
+          syncStamp
+        )
     );
 
 
-  const CHUNK_SIZE = 50;
+  const CHUNK_SIZE =
+    50;
 
 
   for (
@@ -303,30 +933,69 @@ async function syncGreekEvents(
   }
 
 
-  return statements.length;
+  await env.DB.prepare(`
+    UPDATE events
+
+    SET
+      status = 'inactive',
+      updated_at = CURRENT_TIMESTAMP
+
+    WHERE
+      source = ?
+      AND (
+        last_seen_at IS NULL
+        OR last_seen_at <> ?
+      )
+  `)
+  .bind(
+    source,
+    syncStamp
+  )
+  .run();
+
+
+  return events.length;
 }
 
 
 
-async function runSync(env) {
+/*
+  SOURCE RUNNERS
+*/
+
+async function syncLegacySource(
+  env
+) {
   const locator =
-    await fetchAllLocatorEvents();
+    await fetchAllLegacyEvents();
 
 
   const greekEvents =
-    locator.events.filter(
-      isGreekEvent
-    );
+    locator.events
+      .filter(
+        isGreekLegacyEvent
+      );
+
+
+  const normalized =
+    greekEvents
+      .map(
+        normalizeLegacyEvent
+      );
 
 
   const synced =
-    await syncGreekEvents(
+    await syncSourceEvents(
       env,
-      greekEvents
+      "legacy-locator",
+      normalized
     );
 
 
   return {
+    source:
+      "legacy-locator",
+
     locator_total:
       locator.total,
 
@@ -343,14 +1012,527 @@ async function runSync(env) {
 
 
 
+async function syncPlayRiftboundSource(
+  env
+) {
+  const result =
+    await fetchAllPlayRiftboundEvents();
+
+
+  const greekEvents =
+    result.events
+      .filter(
+        isGreekPlayRiftboundEvent
+      );
+
+
+  const normalized =
+    greekEvents
+      .map(
+        normalizePlayRiftboundEvent
+      );
+
+
+  const synced =
+    await syncSourceEvents(
+      env,
+      "playriftbound",
+      normalized
+    );
+
+
+  return {
+    source:
+      "playriftbound",
+
+    pages_checked:
+      result.pagesChecked,
+
+    events_downloaded:
+      result.events.length,
+
+    greek_events_found:
+      greekEvents.length,
+
+    events_synced:
+      synced
+  };
+}
+
+
+
+/*
+  COMPLETE SYNC
+
+  Οι δύο πηγές είναι ανεξάρτητες.
+
+  Αν π.χ. το PlayRiftbound αλλάξει API,
+  το Legacy Locator συνεχίζει να ενημερώνεται.
+*/
+
+async function runSync(
+  env
+) {
+  let legacyResult =
+    null;
+
+  let playRiftboundResult =
+    null;
+
+  const errors = {};
+
+
+  try {
+    legacyResult =
+      await syncLegacySource(
+        env
+      );
+  }
+
+  catch (error) {
+    errors.legacy_locator =
+      String(error);
+  }
+
+
+  try {
+    playRiftboundResult =
+      await syncPlayRiftboundSource(
+        env
+      );
+  }
+
+  catch (error) {
+    errors.playriftbound =
+      String(error);
+  }
+
+
+  if (
+    !legacyResult &&
+    !playRiftboundResult
+  ) {
+    throw new Error(
+      `All event sources failed: ${JSON.stringify(errors)}`
+    );
+  }
+
+
+  return {
+    legacy_locator:
+      legacyResult,
+
+    playriftbound:
+      playRiftboundResult,
+
+    partial_failure:
+      Object.keys(errors)
+        .length > 0,
+
+    errors
+  };
+}
+
+
+
+/*
+  DEDUPLICATION
+
+  Αποθηκεύουμε και τις δύο πηγές στη D1,
+  αλλά δεν θέλουμε το ίδιο event
+  να εμφανίζεται δύο φορές στο site.
+
+  Όταν δύο events:
+  - είναι από διαφορετική πηγή
+  - είναι στο ίδιο κατάστημα / ίδιο σημείο
+  - ξεκινούν μέσα σε 5 λεπτά
+
+  θεωρούμε ότι είναι το ίδιο event.
+
+  Προτιμάμε PlayRiftbound,
+  επειδή είναι το νέο επίσημο σύστημα.
+*/
+
+function sourcePriority(
+  event
+) {
+  if (
+    event.source ===
+    "playriftbound"
+  ) {
+    return 2;
+  }
+
+  if (
+    event.source ===
+    "legacy-locator"
+  ) {
+    return 1;
+  }
+
+  return 0;
+}
+
+
+
+function sameVenue(
+  a,
+  b
+) {
+  const aStore =
+    normalizeVenueName(
+      a.store_name
+    );
+
+  const bStore =
+    normalizeVenueName(
+      b.store_name
+    );
+
+
+  if (
+    aStore &&
+    bStore &&
+    aStore === bStore
+  ) {
+    return true;
+  }
+
+
+  const aLat =
+    safeCoordinate(
+      a.latitude
+    );
+
+  const aLon =
+    safeCoordinate(
+      a.longitude
+    );
+
+  const bLat =
+    safeCoordinate(
+      b.latitude
+    );
+
+  const bLon =
+    safeCoordinate(
+      b.longitude
+    );
+
+
+  if (
+    aLat === null ||
+    aLon === null ||
+    bLat === null ||
+    bLon === null
+  ) {
+    return false;
+  }
+
+
+  return (
+    distanceKm(
+      aLat,
+      aLon,
+      bLat,
+      bLon
+    )
+    <= 0.35
+  );
+}
+
+
+
+function likelySameEvent(
+  a,
+  b
+) {
+  if (
+    !a ||
+    !b
+  ) {
+    return false;
+  }
+
+
+  if (
+    a.source ===
+    b.source
+  ) {
+    return false;
+  }
+
+
+  if (
+    !sameVenue(a,b)
+  ) {
+    return false;
+  }
+
+
+  const aTime =
+    Date.parse(
+      a.start_time
+    );
+
+  const bTime =
+    Date.parse(
+      b.start_time
+    );
+
+
+  if (
+    !Number.isFinite(aTime) ||
+    !Number.isFinite(bTime)
+  ) {
+    return false;
+  }
+
+
+  const difference =
+    Math.abs(
+      aTime - bTime
+    );
+
+
+  return (
+    difference <=
+    5 * 60 * 1000
+  );
+}
+
+
+
+function dedupeEvents(
+  events
+) {
+  const sorted =
+    [...events]
+      .sort(
+        (a,b) => {
+          const priority =
+            sourcePriority(b) -
+            sourcePriority(a);
+
+          if (priority !== 0) {
+            return priority;
+          }
+
+
+          const aTime =
+            Date.parse(
+              a.start_time
+            );
+
+          const bTime =
+            Date.parse(
+              b.start_time
+            );
+
+
+          if (
+            !Number.isFinite(aTime)
+          ) {
+            return 1;
+          }
+
+          if (
+            !Number.isFinite(bTime)
+          ) {
+            return -1;
+          }
+
+
+          return (
+            aTime - bTime
+          );
+        }
+      );
+
+
+  const kept = [];
+
+
+  for (
+    const event of sorted
+  ) {
+    const duplicate =
+      kept.some(
+        existing =>
+          likelySameEvent(
+            existing,
+            event
+          )
+      );
+
+
+    if (!duplicate) {
+      kept.push(event);
+    }
+  }
+
+
+  kept.sort(
+    (a,b) => {
+      const aTime =
+        Date.parse(
+          a.start_time
+        );
+
+      const bTime =
+        Date.parse(
+          b.start_time
+        );
+
+
+      if (
+        !Number.isFinite(aTime)
+      ) {
+        return 1;
+      }
+
+      if (
+        !Number.isFinite(bTime)
+      ) {
+        return -1;
+      }
+
+
+      return (
+        aTime - bTime
+      );
+    }
+  );
+
+
+  return kept;
+}
+
+
+
+/*
+  API HELPERS
+*/
+
+function jsonResponse(
+  data,
+  cacheControl =
+    "public, max-age=300"
+) {
+  return Response.json(
+    data,
+    {
+      headers: {
+        "Access-Control-Allow-Origin":
+          "*",
+
+        "Cache-Control":
+          cacheControl
+      }
+    }
+  );
+}
+
+
+
+async function getUpcomingEvents(
+  env
+) {
+  const { results } =
+    await env.DB.prepare(`
+      SELECT
+        external_id,
+        title,
+        store_name,
+        city,
+        address,
+        event_type,
+        start_time,
+        event_url,
+        latitude,
+        longitude,
+        status,
+        source
+
+      FROM events
+
+      WHERE
+        status = 'active'
+
+      ORDER BY
+        start_time ASC
+    `)
+    .all();
+
+
+  return dedupeEvents(
+    results
+  );
+}
+
+
+
+async function getCalendarEvents(
+  env
+) {
+  const now =
+    new Date()
+      .toISOString();
+
+
+  const { results } =
+    await env.DB.prepare(`
+      SELECT
+        external_id,
+        title,
+        store_name,
+        city,
+        address,
+        event_type,
+        start_time,
+        event_url,
+        latitude,
+        longitude,
+        status,
+        source
+
+      FROM events
+
+      WHERE
+        status = 'active'
+        OR (
+          start_time IS NOT NULL
+          AND datetime(start_time)
+            < datetime(?)
+        )
+
+      ORDER BY
+        start_time ASC
+    `)
+    .bind(now)
+    .all();
+
+
+  return dedupeEvents(
+    results
+  );
+}
+
+
+
+/*
+  WORKER
+*/
+
 export default {
   async fetch(
     request,
     env
   ) {
     const url =
-      new URL(request.url);
-
+      new URL(
+        request.url
+      );
 
 
     /*
@@ -363,25 +1545,32 @@ export default {
     ) {
       try {
         const result =
-          await runSync(env);
+          await runSync(
+            env
+          );
 
 
-        return Response.json({
-          success: true,
-          ...result
-        });
+        return jsonResponse(
+          {
+            success:
+              true,
+
+            ...result
+          },
+          "no-store"
+        );
       }
 
       catch (error) {
-        return Response.json(
+        return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             error:
               String(error)
           },
-          {
-            status: 500
-          }
+          "no-store"
         );
       }
     }
@@ -396,41 +1585,14 @@ export default {
       url.pathname ===
       "/api/events"
     ) {
-      const { results } =
-        await env.DB.prepare(`
-          SELECT
-            external_id,
-            title,
-            store_name,
-            city,
-            address,
-            event_type,
-            start_time,
-            event_url,
-            latitude,
-            longitude,
-            status
-
-          FROM events
-
-          WHERE status = 'active'
-
-          ORDER BY
-            start_time ASC
-        `).all();
+      const events =
+        await getUpcomingEvents(
+          env
+        );
 
 
-      return Response.json(
-        results,
-        {
-          headers: {
-            "Access-Control-Allow-Origin":
-              "*",
-
-            "Cache-Control":
-              "public, max-age=300"
-          }
-        }
+      return jsonResponse(
+        events
       );
     }
 
@@ -444,11 +1606,55 @@ export default {
       url.pathname ===
       "/api/calendar-events"
     ) {
-      const now =
-        new Date().toISOString();
+      const events =
+        await getCalendarEvents(
+          env
+        );
 
 
-      const { results } =
+      return jsonResponse(
+        events
+      );
+    }
+
+
+
+    /*
+      STATUS
+    */
+
+    if (
+      url.pathname ===
+      "/api/status"
+    ) {
+      const latest =
+        await env.DB.prepare(`
+          SELECT
+            last_seen_at
+
+          FROM events
+
+          WHERE
+            source IN (
+              'legacy-locator',
+              'playriftbound'
+            )
+            AND last_seen_at
+              IS NOT NULL
+
+          ORDER BY
+            datetime(last_seen_at)
+            DESC
+
+          LIMIT 1
+        `)
+        .first();
+
+
+      const {
+        results:
+          activeRows
+      } =
         await env.DB.prepare(`
           SELECT
             external_id,
@@ -461,55 +1667,36 @@ export default {
             event_url,
             latitude,
             longitude,
-            status
+            status,
+            source
 
           FROM events
 
           WHERE
             status = 'active'
-            OR start_time < ?
-
-          ORDER BY
-            start_time ASC
         `)
-        .bind(now)
         .all();
 
 
-      return Response.json(
-        results,
-        {
-          headers: {
-            "Access-Control-Allow-Origin":
-              "*",
-
-            "Cache-Control":
-              "public, max-age=300"
-          }
-        }
-      );
-    }
-
-
-
-    /*
-      SYNC STATUS
-    */
-
-    if (
-      url.pathname ===
-      "/api/status"
-    ) {
-      const status =
+      const {
+        results:
+          sourceRows
+      } =
         await env.DB.prepare(`
           SELECT
-            MAX(last_seen_at)
-              AS last_successful_sync,
+            source,
 
-            COUNT(
+            MAX(
+              last_seen_at
+            )
+              AS last_sync,
+
+            SUM(
               CASE
-                WHEN status = 'active'
+                WHEN status =
+                  'active'
                 THEN 1
+                ELSE 0
               END
             )
               AS active_events
@@ -517,33 +1704,58 @@ export default {
           FROM events
 
           WHERE
-            source = 'legacy-locator'
+            source IN (
+              'legacy-locator',
+              'playriftbound'
+            )
+
+          GROUP BY
+            source
         `)
-        .first();
+        .all();
 
 
-      return Response.json(
-        {
-          online: true,
+      const sources = {};
 
-          last_successful_sync:
-            status?.last_successful_sync ||
+
+      for (
+        const row of
+        sourceRows
+      ) {
+        sources[
+          row.source
+        ] = {
+          last_sync:
+            row.last_sync ||
             null,
 
           active_events:
             Number(
-              status?.active_events || 0
+              row.active_events ||
+              0
             )
-        },
-        {
-          headers: {
-            "Access-Control-Allow-Origin":
-              "*",
+        };
+      }
 
-            "Cache-Control":
-              "no-store"
-          }
-        }
+
+      return jsonResponse(
+        {
+          online:
+            true,
+
+          last_successful_sync:
+            latest
+              ?.last_seen_at ||
+            null,
+
+          active_events:
+            dedupeEvents(
+              activeRows
+            ).length,
+
+          sources
+        },
+        "no-store"
       );
     }
 
@@ -568,7 +1780,9 @@ export default {
     ctx
   ) {
     ctx.waitUntil(
-      runSync(env)
+      runSync(
+        env
+      )
     );
   }
 };
